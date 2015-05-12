@@ -14,13 +14,14 @@
     {% block more_header %}{% endblock %}
     <style>
       {% block more_css %}{% endblock more_css %}
+      nav.navbar {border-radius: 0!important;}
     </style>
     <!-- COLLECTED CSS -->
   </head>
 
   <body>
     <!-- Docs master nav -->
-    <nav class="navbar navbar-default" role="navigation">
+    <nav class="navbar navbar-inverse" role="navigation">
       <div class="navbar-header">
           <a href="{{url_for('index.index')}}" class="navbar-brand">Argonath</a>
       </div>
