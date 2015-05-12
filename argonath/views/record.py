@@ -28,6 +28,14 @@ def get_record(record_id):
         abort(404)
     return render_template('record.html', record=record)
 
+@bp.route('/search/')
+def query_record():
+    query = request.args.get('q', type=str, default='')
+    r = Record.get_by_name(query)
+    if not r:
+        abort(404)
+    return render_template('record.html', record=r)
+
 @bp.route('/create/', methods=['GET', 'POST'])
 @need_login
 def create_record():

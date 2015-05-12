@@ -1,0 +1,8 @@
+appname: "argonath"
+entrypoints:
+  web:
+    cmd: "gunicorn -c gunicorn_config.py app:app"
+    ports:
+      - "5000/tcp"
+build:
+  - "pip install -r requirements.txt"
