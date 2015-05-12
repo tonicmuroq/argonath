@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title %}{% endblock %} · Argonath DNS Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Le styles -->
+    <link href="/argonath/static/css/vendor/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="/argonath/static/css/flat-ui.min.css" rel="stylesheet" type="text/css">
+    <link href="/argonath/static/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <script src="/argonath/static/js/vendor/jquery.min.js"></script>
+    <script src="/argonath/static/js/flat-ui.min.js"></script>
+    {% block more_header %}{% endblock %}
+    <style>
+      {% block more_css %}{% endblock more_css %}
+    </style>
+    <!-- COLLECTED CSS -->
+  </head>
+
+  <body>
+    <!-- Docs master nav -->
+    <nav class="navbar navbar-default" role="navigation">
+      <div class="navbar-header">
+        <a href="" class="navbar-brand">Argonath</a>
+      </div>
+      <div class="collapse navbar-collapse" id="navbar-collapse-01">
+        <ul class="nav navbar-nav navbar-left">
+          <li class="{{'active' if request.path == url_for('record.list_all_records') else ''}}">
+            <a href="{{url_for('record.list_all_records')}}"><span class="fui-list-bulleted"></span> 所有记录</a>
+          </li>
+          <li class="{{'active' if request.path == url_for('record.list_my_records') else ''}}">
+            <a href="{{url_for('record.list_my_records')}}"><span class="fui-user"></span> 我的记录</a>
+          </li>
+          <li class="{{'active' if request.path == url_for('record.create_record') else ''}}">
+            <a href="{{url_for('record.create_record')}}"><span class="fui-plus"></span> 创建记录</a>
+          </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{g.user.name or '未登录'}} <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              {% if g.user %}
+                <li><a href="{{openid2.logout_url}}">Logout</a></li>
+              {% else %}
+                <li><a href="{{openid2.login_url}}">Login</a></li>
+              {% endif %}
+            </ul>
+          </li>
+        </ul>
+      <div>
+    </nav>
+
+    <!-- Docs page layout -->
+    <div class="bs-header" id="content">
+      <div class="container">
+        {% block more_content_header %}{% endblock %}
+      </div>
+    </div>
+
+    <div class="container bs-docs-container">
+      <div class="row">
+      {% block main %}
+        <div class="col-md-3">
+          {% block main_left %}
+          {% endblock %}
+        </div>
+        <div class="col-md-9">
+          {% block main_right%}
+          {% endblock %}
+        </div>
+      {% endblock %}
+      {% block sidebar %}{% endblock %}
+      </div>
+    </div>
+
+    <!-- Footer ================================================== -->
+    <footer class="footer container">
+        {% block footer %}{% endblock %}
+    </footer>
+
+    <!-- Le javascript ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    {% block bottom_script %}{% endblock %}
+    <!-- COLLECTED JS -->
+  </body>
+</html>

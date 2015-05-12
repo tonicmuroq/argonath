@@ -1,0 +1,38 @@
+{% extends "/base.html" %}
+{% import "/utils.html" as utils %}
+
+{% block main %}
+  <form class="form-horizontal" method="post" action="{{url_for('record.create_record')}}">
+    <div class="form-group">
+      <label class="col-sm-2 control-label">域名</label>
+      <div class="col-sm-2">
+        <input name="name" type="text" class="form-control" placeholder="域名, 如argonath">
+      </div>
+      <div class="col-sm-2">
+        <span>.intra.hunantv.com</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-sm-2 control-label">地址</label>
+      <div class="col-sm-4">
+        <input name="host" type="text" class="form-control" placeholder="地址, 如10.1.201.47, 或者redis-ctl.intra.hunantv.com">
+      </div>
+    </div>
+    {% with errors = get_flashed_messages(category_filter=['error'])%}
+      {% if errors %}
+        <div class="form-group">
+          {% for error in errors %}
+            <label class="text-danger col-sm-offset-2 col-sm-4">
+              <span class="fui-cross-circle"></span> {{error}}
+            </label>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    <div class="form-group">
+      <div class="col-sm-offset-2 col-sm-4">
+        <button type="submit" class="btn btn-primary">就决定是你了!</button>
+      </div>
+    </div>
+  </form>
+{% endblock %}

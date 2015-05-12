@@ -1,0 +1,65 @@
+{% extends "/base.html" %}
+{% import "/utils.html" as utils %}
+
+{% block main %}
+  <table class="table table-striped">
+    <tbody>
+      <tr>
+        <td>域名</td>
+        <td>{{record.domain}}</td>
+      </tr>
+      <tr>
+        <td>地址</td>
+        <td>{{record.host}}</td>
+      </tr>
+      <tr>
+        <td>所有者</td>
+        <td>{{record.user.name}}</td>
+      </tr>
+      <tr>
+        <td>所有者邮箱</td>
+        <td>{{record.user.email}}</td>
+      </tr>
+      <tr>
+        <td>创建时间</td>
+        <td>{{record.time}}</td>
+      </tr>
+    </tbody>
+  </table>
+  {% if record.can_do(g.user) %}
+    <div class="row">
+      <label class="indent-15-px">
+        <span class="fui-alert-circle text-info"> 你是所有者, 你可以编辑或者删除:</span>
+      </label>
+    </div>
+    <div class="row">
+      <div class="col-xs-3">
+        <a class="btn btn-block btn-lg btn-warning" href="{{url_for('record.edit_record', record_id=record.id)}}">
+          <span class="fui-new"></span> 修改
+        </a>
+      </div>
+      <div class="col-xs-3">
+        <a class="btn btn-block btn-lg btn-danger" href="{{url_for('record.delete_record', record_id=record.id)}}">
+          <span class="fui-trash"></span> 删除
+        </a>
+      </div>
+    </div>
+    <script>
+      $('.btn-danger.btn-lg').click(function(e){
+        if (!confirm('确定要删除么?')) {
+          return;
+        }
+        e.preventDefault();
+        var self = $(this),
+          href = self.attr('href');
+        $.post(href, {}, function(){
+          window.location.href = '/';
+        });
+      })
+    </script>
+  {% endif %}
+{% endblock %}
+
+{% block more_css %}
+  .indent-15-px { margin-left: 15px; }
+{% endblock %}
