@@ -70,10 +70,12 @@ class Record(Base):
     @classmethod
     def list_records(cls, start=0, limit=20):
         """还会返回总数"""
-        q = cls.query.order_by(cls.id.desc()).offset(start)
+        q = cls.query.order_by(cls.id.desc())
+        total = q.count()
+        q = q.offset(start)
         if limit is not None:
             q = q.limit(limit)
-        return q.all(), q.count()
+        return q.all(), total
 
     @property
     def skydns_path(self):
@@ -133,10 +135,12 @@ class User(Base):
 
     def list_records(self, start=0, limit=20):
         """还会返回总数"""
-        q = self.records.order_by(Record.id.desc()).offset(start)
+        q = self.records.order_by(Record.id.desc())
+        total = q.count()
+        q = q.offset(start)
         if limit is not None:
             q = q.limit(limit)
-        return q.all(), q.count()
+        return q.all(), total
 
     def is_admin(self):
         """-_-!"""
