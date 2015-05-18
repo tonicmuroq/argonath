@@ -1,0 +1,89 @@
+{% extends "/base.html" %}
+
+{% block main %}
+  <div class="row">
+    <table class="table table-striped">
+      <tbody>
+        <tr>
+          <td>名字</td>
+          <td>{{user.name}}</td>
+        </tr>
+        <tr>
+          <td>邮箱</td>
+          <td>{{user.email}}</td>
+        </tr>
+        <tr>
+          <td>API token (嫑给别人哦)</td>
+          <td>{{user.token}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="row">
+    <h4>API 文档</h4>
+    <ul>
+      <li>
+        <p>有一些 API 需要 token 标记当前用户身份</p>
+        <p>需要在 headers 里设置 API token:
+        <pre>token: {{user.token}}</pre>
+        <p>或者在参数里设置<pre>?token={{user.token}}</pre></p>
+      </li>
+      <li>
+        <p>返回值格式</p>
+        <ul>
+          <li>
+            <p>基本格式</p>
+            <p><pre>{"r": 0, "message": "ok", data: null}</pre></p>
+            <p>r 非 0 则有错误, 错误信息在 message 字段, data 字段为返回的数据内容, 可能是 record, 可能是 [record, ... ], 可能是 null</p>
+          </li>
+          <li>
+            <p>record 格式</p>
+            <p>
+              <pre>
+{
+    "domain": "argonath.intra.hunantv.com",
+    "host": "10.1.201.49",
+    "id": 10001,
+    "name": "argonath",
+    "time": "2015-05-18 12:47:53",
+    "user_id": 10002
+}</pre>
+            </p>
+          </li>
+          <li>
+            <p>返回值代码</p>
+            <p>400 / 403 / 404 / 500 有对应的 message 字段错误说明.</p>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <p>获取所有的记录</p>
+        <p><pre>GET /_api/record/all/?start=0&limit=20</pre></p>
+      </li>
+      <li>
+        <p>获取单个记录</p>
+        <p><pre>GET /_api/record/&lt;record_id&gt;/?start=0&limit=20</pre></p>
+      </li>
+      <li>
+        <p>搜索记录</p>
+        <p><pre>GET /_api/record/search/?q=&lt;query&gt;</pre></p>
+      </li>
+      <li>
+        <p>获取自己的所有的记录 <b>(需要 token)</b></p>
+        <p><pre>GET /_api/record/mine/?start=0&limit=20</pre></p>
+      </li>
+      <li>
+        <p>创建一条记录 <b>(需要 token)</b></p>
+        <p><pre>POST /_api/record/create/ name=&lt;name&gt; host=&lt;host&gt; form 提交</pre></p>
+      </li>
+      <li>
+        <p>编辑一条记录 <b>(需要 token)</b></p>
+        <p><pre>PUT /_api/record/&lt;record_id&gt;/edit/ host=&lt;host&gt; form 提交</pre></p>
+      </li>
+      <li>
+        <p>删除一条记录 <b>(需要 token)</b></p>
+        <p><pre>DELETE /_api/record/&lt;record_id&gt;/</pre></p>
+      </li>
+    </ul>
+  </div>
+{% endblock %}

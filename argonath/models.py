@@ -104,24 +104,32 @@ class Record(Base):
         db.session.delete(self)
         db.session.commit()
 
+    def to_dict(self):
+        d = super(Record, self).to_dict()
+        d['host'] = self.host
+        return d
+
 class User(Base):
 
     __tablename__ = 'user'
     name = db.Column(db.String(255), index=True, nullable=False, default='')
     email = db.Column(db.String(255), unique=True, nullable=False, default='')
+    token = db.Column(db.String(255), unique=True, nullable=False, default='')
     records = db.relationship('Record', backref='user', lazy='dynamic')
 
-    def __init__(self, name, email):
+    def __init__(self, name, email, token):
         self.name = name
         self.email = email
+        self.token = token
 
     @classmethod
     def get_or_create(cls, name, email):
+        from argonath.utils import random_string
         u = cls.get_by_email(email)
         if u:
             return u
         try:
-            u = cls(name, email)
+            u = cls(name, email, random_string(20))
             db.session.add(u)
             db.session.commit()
             return u
@@ -132,6 +140,10 @@ class User(Base):
     @classmethod
     def get_by_email(cls, email):
         return cls.query.filter(cls.email == email).first()
+
+    @classmethod
+    def get_by_token(cls, token):
+        return cls.query.filter(cls.token == token).first()
 
     def list_records(self, start=0, limit=20):
         """还会返回总数"""
@@ -145,3 +157,9 @@ class User(Base):
     def is_admin(self):
         """-_-!"""
         return self.name == 'tonic'
+
+    def to_dict(self):
+        d = super(User, self).to_dict()
+        d.pop('token', None)
+        d['is_admin'] = self.is_admin()
+        return d

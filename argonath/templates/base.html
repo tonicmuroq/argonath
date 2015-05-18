@@ -36,6 +36,9 @@
           <li class="{{'active' if request.path == url_for('record.create_record') else ''}}">
             <a href="{{url_for('record.create_record')}}"><span class="fui-plus"></span> 创建记录</a>
           </li>
+          <li class="{{'active' if request.path == url_for('index.profile') else ''}}">
+            <a href="{{url_for('index.profile')}}"><span class="fui-document"></span> API 文档</a>
+          </li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <li class="dropdown">

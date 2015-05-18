@@ -11,8 +11,9 @@ from argonath.models import User
 from argonath.utils import paginator_kwargs
 
 blueprints = (
-    'record',
     'index',
+    'record',
+    'api',
 )
 
 def create_app():
