@@ -58,7 +58,7 @@ def create_record():
 
     domain = name + '.' + subname + '.hunantv.com'
     
-    r = Record.get_by_name(name)
+    r = Record.get_by_domain(domain)
     if r:
         if r.can_do(g.user):
             flash(u'域名已经存在, 可以编辑', 'info')

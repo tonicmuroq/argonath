@@ -57,7 +57,7 @@ def create_record():
         return _make_error_response(u'不正确的子域名', 400)
     domain = name + '.' + subname + '.hunantv.com'
     
-    r = Record.get_by_name(name)
+    r = Record.get_by_domain(domain)
     if r:
         return _make_error_response(u'记录已经存在, 你可以尝试编辑', 400)
 

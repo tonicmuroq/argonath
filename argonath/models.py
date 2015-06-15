@@ -68,6 +68,10 @@ class Record(Base):
         return cls.query.filter(cls.name == name).first()
 
     @classmethod
+    def get_by_domain(cls, domain):
+        return cls.query.filter(cls.domain == domain).first()
+
+    @classmethod
     def list_records(cls, start=0, limit=20):
         """还会返回总数"""
         q = cls.query.order_by(cls.id.desc())
