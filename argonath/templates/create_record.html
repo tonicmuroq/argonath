@@ -9,7 +9,14 @@
         <input name="name" type="text" class="form-control" placeholder="域名, 如argonath">
       </div>
       <div class="col-sm-2">
-        <span>.intra.hunantv.com</span>
+        <select name="subname" class="form-control">
+          {% for subdomain in sub_domains %}
+            <option value="{{subdomain}}">{{subdomain}}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-sm-2">
+        <span>.hunantv.com</span>
       </div>
     </div>
     <div class="form-group">

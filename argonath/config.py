@@ -18,6 +18,8 @@ SQLALCHEMY_POOL_RECYCLE = 2000
 OPENID2_YADIS = 'http://openids.intra.hunantv.com/server/yadis/'
 OPENID2_LOGOUT = 'http://openids.intra.hunantv.com/auth/logout/'
 
+SUBDOMAINS = os.getenv('SUBDOMAINS', 'intra')
+
 try:
     from local_config import *
 except ImportError:

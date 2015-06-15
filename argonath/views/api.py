@@ -4,6 +4,7 @@ from flask import Blueprint, request, g
 
 from argonath.models import User, Record
 from argonath.utils import api_need_token, jsonize
+from argonath.consts import sub_domains
 
 bp = Blueprint('api', __name__, url_prefix='/_api')
 
@@ -45,13 +46,16 @@ def query_record():
 @api_need_token
 def create_record():
     name = request.form.get('name', type=str, default='').strip()
+    subname = request.form.get('subname', type=str, default='').strip()
     host_or_ip = request.form.get('host', type=str, default='').strip()
 
     if len(name) < 5 and not g.user.is_admin():
         return _make_error_response(u'域名长度必须大于5', 400)
     if '.' in name:
         return _make_error_response(u'域名不能包含"."', 400)
-    domain = name + '.intra.hunantv.com'
+    if subname not in sub_domains:
+        return _make_error_response(u'不正确的子域名', 400)
+    domain = name + '.' + subname + '.hunantv.com'
     
     r = Record.get_by_name(name)
     if r:

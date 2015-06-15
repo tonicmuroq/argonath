@@ -5,6 +5,7 @@ from flask import (Blueprint, request, g, abort,
 
 from argonath.models import Record
 from argonath.utils import need_login
+from argonath.consts import sub_domains
 
 bp = Blueprint('record', __name__, url_prefix='/record')
 
@@ -40,8 +41,9 @@ def query_record():
 @need_login
 def create_record():
     if request.method == 'GET':
-        return render_template('create_record.html')
+        return render_template('create_record.html', sub_domains=sub_domains)
     name = request.form.get('name', type=str, default='').strip()
+    subname = request.form.get('subname', type=str, default='').strip()
     host_or_ip = request.form.get('host', type=str, default='').strip()
 
     if len(name) < 5 and not g.user.is_admin():
@@ -50,7 +52,11 @@ def create_record():
     if '.' in name:
         flash(u'域名不能包含"."', 'error')
         return redirect(url_for('record.create_record'))
-    domain = name + '.intra.hunantv.com'
+    if subname not in sub_domains:
+        flash(u'不正确的子域名', 'error')
+        return redirect(url_for('record.create_record'))
+
+    domain = name + '.' + subname + '.hunantv.com'
     
     r = Record.get_by_name(name)
     if r:
