@@ -5,6 +5,7 @@ import etcd
 import json
 import datetime
 import sqlalchemy.exc
+from etcd import EtcdKeyError
 from sqlalchemy.ext.declarative import declared_attr
 
 from argonath.ext import db
@@ -90,7 +91,7 @@ class Record(Base):
         try:
             r = _etcd.get(self.skydns_path)
             return json.loads(r.value)
-        except KeyError:
+        except (KeyError, EtcdKeyError):
             return {}
 
     @property
