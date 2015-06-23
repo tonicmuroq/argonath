@@ -57,7 +57,7 @@ def create_record():
         return redirect(url_for('record.create_record'))
 
     domain = name + '.' + subname + '.hunantv.com'
-    
+
     r = Record.get_by_domain(domain)
     if r:
         if r.can_do(g.user):
@@ -86,7 +86,7 @@ def edit_record(record_id):
     if not host_or_ip:
         flash(u'必须填写一个host', 'error')
         return redirect(url_for('record.edit_record'))
-    
+
     record.edit(host_or_ip)
     return redirect(url_for('record.get_record', record_id=record.id))
 

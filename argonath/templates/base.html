@@ -39,6 +39,12 @@
           <li class="{{'active' if request.path == url_for('index.profile') else ''}}">
             <a href="{{url_for('index.profile')}}"><span class="fui-document"></span> API 文档</a>
           </li>
+          {% if g.user.is_admin %}
+          <li class="{{'active' if request.path == url_for('admin.index') else ''}}">
+            <a href="{{url_for('admin.index')}}"><span class="fui-eye"></span> 特权</a>
+          </li>
+          {% endif %}
+
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <li class="dropdown">

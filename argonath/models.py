@@ -9,9 +9,9 @@ from etcd import EtcdKeyError
 from sqlalchemy.ext.declarative import declared_attr
 
 from argonath.ext import db
-from argonath.config import ETCD_HOST, ETCD_PORT
-
+from argonath.config import ETCD_HOST, ETCD_PORT, ARGONATH_ADMIN
 _etcd = etcd.Client(ETCD_HOST, ETCD_PORT)
+admin_emails = ARGONATH_ADMIN.split(',')
 
 class Base(db.Model):
 
@@ -103,7 +103,7 @@ class Record(Base):
 
     def can_do(self, user):
         return user and (self.user.id == user.id or user.is_admin())
-    
+
     def delete(self):
         _etcd.delete(self.skydns_path)
         db.session.delete(self)
@@ -147,8 +147,24 @@ class User(Base):
         return cls.query.filter(cls.email == email).first()
 
     @classmethod
+    def get_by_name(cls, name):
+        return cls.query.filter(cls.name == name).first()
+
+    @classmethod
     def get_by_token(cls, token):
         return cls.query.filter(cls.token == token).first()
+
+    @classmethod
+    def list_users(cls, start=0, limit=20):
+        return cls.query.offset(start).limit(limit).all()
+
+    @classmethod
+    def transfer(cls, source_user, target_user):
+        target_user.records.extend(source_user.records)
+        source_user.records.delete()
+        db.session.add(target_user)
+        db.session.add(source_user)
+        db.session.commit()
 
     def list_records(self, start=0, limit=20):
         """还会返回总数"""
@@ -161,7 +177,7 @@ class User(Base):
 
     def is_admin(self):
         """-_-!"""
-        return self.name == 'tonic'
+        return self.email in admin_emails
 
     def to_dict(self):
         d = super(User, self).to_dict()

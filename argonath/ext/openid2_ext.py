@@ -45,11 +45,11 @@ class OpenID2Client(object):
         continue_url = req.values.get('continue') or req.headers.get('Referer', '/')
         consumer = Consumer({}, self.store)
         authreq = consumer.begin(current_app.config['OPENID2_YADIS'])
-    
+
         sregreq = sreg.SRegRequest(optional=['username', 'uid'],
                                    required=['email', 'groups'])
         authreq.addExtension(sregreq)
-    
+
         verify_url = urljoin(req.host_url, self.verify_url) + '?' + urlencode({'continue': continue_url})
         urlencode({'continue': continue_url})
         url = authreq.redirectURL(return_to=verify_url, realm=req.host_url)

@@ -5,7 +5,7 @@ import random
 import string
 from datetime import datetime
 from functools import wraps
-from flask import g, redirect, Response
+from flask import abort, g, redirect, Response
 
 from argonath.ext import openid2
 from argonath.models import Base
@@ -23,6 +23,14 @@ def api_need_token(f):
     def _(*args, **kwargs):
         if not g.user:
             return {'r': 1, 'message': 'need token'}, 400
+        return f(*args, **kwargs)
+    return _
+
+def need_admin(f):
+    @wraps(f)
+    def _(*args, **kwargs):
+        if not g.user.is_admin():
+            abort(403)
         return f(*args, **kwargs)
     return _
 
