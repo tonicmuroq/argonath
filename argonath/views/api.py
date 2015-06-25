@@ -56,7 +56,7 @@ def create_record():
     if subname not in sub_domains:
         return _make_error_response(u'不正确的子域名', 400)
     domain = name + '.' + subname + '.hunantv.com'
-    
+
     r = Record.get_by_domain(domain)
     if r:
         return _make_error_response(u'记录已经存在, 你可以尝试编辑', 400)
@@ -79,7 +79,7 @@ def edit_record(record_id):
     host_or_ip = request.form.get('host', type=str, default='').strip()
     if not host_or_ip:
         return _make_error_response(u'必须填写一个host', 400)
-    
+
     record.edit(host_or_ip)
     return {'r': 0, 'message': 'ok', 'data': record}
 

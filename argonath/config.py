@@ -20,6 +20,8 @@ OPENID2_LOGOUT = 'http://openids.intra.hunantv.com/auth/logout/'
 
 SUBDOMAINS = os.getenv('SUBDOMAINS', 'intra')
 
+ARGONATH_ADMIN = os.getenv('ARGONATH_ADMIN', '')
+
 try:
     from local_config import *
 except ImportError:

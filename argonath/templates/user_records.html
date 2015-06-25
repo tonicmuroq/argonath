@@ -1,0 +1,46 @@
+{% extends "/base.html" %}
+{% import "/utils.html" as utils %}
+
+{% block main %}
+<div class='row'>
+  <div class='span3'>
+    用户名 {{user.name}}
+  </div>
+  <div class='span3'>
+      <a href={{url_for('admin.transfer', username=user.name)}} class="btn btn-lg btn-danger">把它的域名搞过来</a>
+  </div>
+</div>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <td>域名</td>
+      <td>主机</td>
+      <td> </td>
+    </tr>
+  </thead>
+  <tbody>
+    {% for record in user.records %}
+      <tr>
+        <td>{{record.domain}}</td>
+        <td>{{record.host}}</td>
+        <td>{{record.user.name}}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+ <script>
+    $('.btn-danger.btn-lg').click(function(e){
+      if (!confirm('你是认真的吗？')) {
+        return;
+      }
+      e.preventDefault();
+      var self = $(this),
+        href = self.attr('href');
+      $.post(href, {}, function(){
+        window.location.href = '/admin/';
+      });
+    })
+  </script>
+
+
+{% endblock %}

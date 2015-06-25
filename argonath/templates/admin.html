@@ -1,0 +1,21 @@
+{% extends "/base.html" %}
+{% import "/utils.html" as utils %}
+
+{% block main %}
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <td>用户</td>
+      <td></td>
+    </tr>
+  </thead>
+  <tbody>
+    {% for user in users %}
+      <tr>
+        <td>{{user.name}}</td>
+        <td align='center'><a href={{url_for('admin.user_records', username=user.name)}} class="btn btn-large btn-primary">瞅瞅</a></td>
+      </tr>
+    {% endfor %}
+  </tbody>
+
+{% endblock %}
