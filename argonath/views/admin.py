@@ -34,10 +34,8 @@ def create_record():
  
     r = Record.get_by_domain(domain)
     if r:
-        if r.can_do(g.user):
-            flash(u'域名已经存在, 可以编辑', 'info')
-            return redirect(url_for('record.edit_record', record_id=r.id))
-        abort(403)
+        flash(u'域名已经存在, 可以编辑', 'info')
+        return redirect(url_for('record.edit_record', record_id=r.id))
     r = Record.create(g.user, name, domain, host_or_ip)
     if not r:
         flash(u'创建失败', 'error')
