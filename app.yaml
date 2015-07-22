@@ -9,3 +9,4 @@ build:
 meta:
   version: "20150722"
   key: "argonath"
+  random: "r"
