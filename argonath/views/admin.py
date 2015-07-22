@@ -23,7 +23,7 @@ def create_record():
         return render_template('admin_record.html')
     name = request.form.get('name', type=str, default='').strip()
     host_or_ip = request.form.get('host', type=str, default='').strip()
-    if len(name) < 5 and not g.user.is_admin():
+    if len(name) < 5:
         flash(u'域名长度必须大于5', 'error')
         return redirect(url_for('admin.create_record'))
     if '.' in name:
