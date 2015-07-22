@@ -6,3 +6,6 @@ entrypoints:
       - "5000/tcp"
 build:
   - "pip install -r requirements.txt"
+meta:
+  version: "20150722"
+  key: "argonath"
