@@ -15,7 +15,7 @@ def index():
     users = User.list_users()
     return render_template('admin.html', user=g.user, users=users)
 
-@bp.route('/create/', methods=['GET','POST'])
+@bp.route('/create/', methods=['GET', 'POST'])
 @need_login
 @need_admin
 def create_record():
