@@ -43,6 +43,10 @@
           <li class="{{'active' if request.path == url_for('admin.index') else ''}}">
             <a href="{{url_for('admin.index')}}"><span class="fui-eye"></span> 特权</a>
           </li>
+          <li class="{{'active' if request.path == url_for('admin.create_record') else ''}}">
+            <a href="{{url_for('admin.create_record')}}"><span class="fui-heart"></span>创建admin域名</a>
+          </li>
+         
           {% endif %}
 
         </ul>
