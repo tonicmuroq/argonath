@@ -1,0 +1,25 @@
+{% extends "/base.html" %}
+{% import "/utils.html" as utils %}
+
+{% block main %}
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <td>域名</td>
+        <td>地址</td>
+        <td>所有者</td>
+      </tr>
+    </thead>
+    <tbody>
+      {% for record in records %}
+        <tr>
+            <td><a href="{{url_for('record.get_record', record_id=record.id)}}" target="_blank">{{record.domain}}</a></td>
+          <td>{{record.host}}</td>
+          <td>{{record.user.name}}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {{utils.paginator(g.start, total, g.limit, endpoint)}}
+
+{% endblock %}

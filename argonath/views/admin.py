@@ -41,7 +41,14 @@ def create_record():
         flash(u'创建失败', 'error')
         return redirect(url_for('admin.create_record'))
     return redirect(url_for('record.get_record', record_id=r.id))
- 
+
+@bp.route('/list/')
+@need_login
+@need_admin
+def list_my_records():
+    records, total = g.user.list_records(g.start, g.limit)
+    admin_records = [r for r in records if r.domain.split('.')[1] == 'hunantv']
+    return render_template('admin_list.html', records=admin_records, total=total, endpoint='admin.list_my_records')
 
 @bp.route('/user_records/<username>/')
 @need_login
