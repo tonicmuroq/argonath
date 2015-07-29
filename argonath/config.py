@@ -23,7 +23,7 @@ SUBDOMAINS = os.getenv('SUBDOMAINS', 'intra')
 ARGONATH_ADMIN = os.getenv('ARGONATH_ADMIN', '')
 
 try:
-    from local_config import *
+    from .local_config import *
 except ImportError:
     pass
 
