@@ -7,6 +7,5 @@ DNS Management
 
 override config in `argonath/local_config.py`, options are shown in `argonath/config.py` , then
 
-        $ python tools/flushdb.py
-        
-        $ python app.py
+    $ python tools/flushdb.py
+    $ python app.py
