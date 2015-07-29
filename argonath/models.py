@@ -120,6 +120,7 @@ class User(Base):
     name = db.Column(db.String(255), index=True, nullable=False, default='')
     email = db.Column(db.String(255), unique=True, nullable=False, default='')
     token = db.Column(db.String(255), unique=True, nullable=False, default='')
+    admin = db.Column(db.Boolean, default=False)
     records = db.relationship('Record', backref='user', lazy='dynamic')
 
     def __init__(self, name, email, token):
@@ -177,7 +178,7 @@ class User(Base):
 
     def is_admin(self):
         """-_-!"""
-        return self.email in admin_emails
+        return self.admin
 
     def to_dict(self):
         d = super(User, self).to_dict()

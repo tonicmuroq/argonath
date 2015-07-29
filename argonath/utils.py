@@ -41,7 +41,7 @@ def paginator_kwargs(kw):
     return d
 
 def random_string(length):
-    return ''.join(random.sample(string.ascii_letters, length))
+    return ''.join(random.sample(string.ascii_letters + string.digits, length))
 
 class ArgonathJSONEncoder(json.JSONEncoder):
     def default(self, obj):
