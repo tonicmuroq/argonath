@@ -235,17 +235,23 @@ class CIDR(Base):
             c = cls(name, str(net))
             db.session.add(c)
             db.session.commit()
+            return c
         except sqlalchemy.exc.IntegrityError:
             db.session.rollback()
             return None
 
     @classmethod
     def get_by_name(cls, name):
-        cls.query.filter(cls.name == name).first()
+        return cls.query.filter(cls.name == name).first()
 
     @classmethod
-    def list_records(cls, start=0, limit=20):
-        return cls.query.order_by(cls.id.desc()).all()
+    def list_cidrs(cls, start=0, limit=20):
+        q = cls.query.order_by(cls.id.desc())
+        total = q.count()
+        q = q.offset(start)
+        if limit is not None:
+            q = q.limit(limit)
+        return q.all(), total
 
     def edit(self, name, cidr):
         try:
@@ -257,6 +263,7 @@ class CIDR(Base):
             self.cidr=cidr
             db.session.add(self)
             db.session.commit()
+            return self
         except sqlalchemy.exc.IntegrityError:
             db.session.rollback()
             return None

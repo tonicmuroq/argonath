@@ -1,0 +1,51 @@
+{% extends "/base.html" %}
+{% import "/utils.html" as utils %}
+
+{% block main %}
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <td>Network Name</td>
+        <td>CIDR</td>
+        <td>Ops</td>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in cidrs %}
+        <tr>
+          <td><a href="{{url_for('admin.get_cidr', id=c.id)}}" target="_blank">{{c.name}}</a></td>
+          <td>{{c.cidr}}</td>
+          <td>
+            <a class="btn btn-block btn-lg btn-danger" href="{{url_for('admin.delete_cidr', id=c.id)}}">
+            <span class="fui-trash"></span> 删除
+            </a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="row">
+    <div class="col-xs-3">
+      <a class="btn btn-block btn-lg btn-warning" href="{{url_for('admin.create_cidr')}}">
+      <span class="fui-new"></span> NEW CIDR
+      </a>
+    </div>
+  </div>
+
+  {{utils.paginator(g.start, total, g.limit, endpoint)}}
+
+  <script>
+    $('.btn-danger.btn-lg').click(function(e){
+      if (!confirm('确定要删除么?')) {
+        return;
+      }
+      e.preventDefault();
+      var self = $(this),
+        href = self.attr('href');
+      $.post(href, {}, function(){
+          window.location.href = "{{url_for('admin.cidrs_show')}}";
+      });
+    });
+  </script>
+
+{% endblock %}

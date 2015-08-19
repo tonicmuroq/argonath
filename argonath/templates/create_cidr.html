@@ -1,0 +1,36 @@
+{% extends "/base.html" %}
+{% import "/utils.html" as utils %}
+
+{% block main %}
+  <form class="form-horizontal" method="post" action="{{url_for('admin.create_cidr')}}">
+    <div class="form-group">
+      <label class="col-sm-2 control-label">Network Name</label>
+      <div class="col-sm-4">
+        <input name="name" type="text" class="form-control" placeholder="Network Name, ep. yg">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="col-sm-2 control-label">CIDR</label>
+      <div class="col-sm-4">
+        <input name="cidr" type="text" class="form-control" placeholder="CIDR, ep. 192.168.0.0/24">
+      </div>
+    </div>
+    {% with errors = get_flashed_messages(category_filter=['error'])%}
+      {% if errors %}
+        <div class="form-group">
+          {% for error in errors %}
+            <label class="text-danger col-sm-offset-2 col-sm-4">
+              <span class="fui-cross-circle"></span> {{error}}
+            </label>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    <div class="form-group">
+      <div class="col-sm-offset-2 col-sm-4">
+        <button type="submit" class="btn btn-primary">就决定是你了!</button>
+      </div>
+    </div>
+  </form>
+{% endblock %}
