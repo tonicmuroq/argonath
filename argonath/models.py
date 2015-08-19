@@ -193,8 +193,8 @@ class User(Base):
 
 class CIDR(Base):
     __tablename__ = "cidr"
-    name = db.Column(db.String(255), unique=True, index=True, nullable=False)
-    cidr = db.Column(db.String(255), unique=True, index=True, nullable=False)
+    name = db.Column(db.String(255), unique=True, nullable=False)
+    cidr = db.Column(db.String(255), unique=True, nullable=False)
     time = db.Column(db.DateTime, default=datetime.datetime.now)
 
     def __init__(self, name, cidr):
