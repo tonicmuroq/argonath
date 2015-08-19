@@ -7,11 +7,13 @@ import datetime
 import sqlalchemy.exc
 from etcd import EtcdKeyError
 from sqlalchemy.ext.declarative import declared_attr
+from netaddr import IPNetwork, AddrFormatError
 
 from argonath.ext import db
 from argonath.config import ETCD_HOST, ETCD_PORT, ARGONATH_ADMIN
 _etcd = etcd.Client(ETCD_HOST, ETCD_PORT)
 admin_emails = ARGONATH_ADMIN.split(',')
+
 
 class Base(db.Model):
 
@@ -36,6 +38,7 @@ class Base(db.Model):
     def __repr__(self):
         attrs = ', '.join('{0}={1}'.format(k, v) for k, v in self.to_dict().iteritems())
         return '{0}({1})'.format(self.__class__.__name__, attrs)
+
 
 class Record(Base):
 
@@ -114,6 +117,7 @@ class Record(Base):
         d['host'] = self.host
         return d
 
+
 class User(Base):
 
     __tablename__ = 'user'
@@ -185,3 +189,55 @@ class User(Base):
         d.pop('token', None)
         d['is_admin'] = self.is_admin()
         return d
+
+
+class CIDR(Base):
+    __tablename__ = "cidr"
+    name = db.Column(db.String(255), unique=True, nullable=False)
+    cidr = db.Column(db.String(255), unique=True, nullable=False)
+    time = db.Column(db.DateTime, default=datetime.datetime.now)
+
+    def __init__(self, name, cidr):
+        self.name = name
+        self.cidr = cidr
+
+    @classmethod
+    def create(cls, name, cidr):
+        try:
+            net = IPNetwork(cidr)
+        except AddrFormatError:
+            return None
+
+        try:
+            c = cls(name, str(net))
+            db.session.add(c)
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
+            return None
+
+    @classmethod
+    def get_by_name(cls, name):
+        cls.query.filter(cls.name == name).first()
+
+    @classmethod
+    def list_records(cls, start=0, limit=20):
+        return cls.query.order_by(cls.id.desc()).all()
+
+    def edit(self, name, cidr):
+        try:
+            IPNetwork(cidr)
+        except AddrFormatError:
+            return None
+        try:
+            self.name=name
+            self.cidr=cidr
+            db.session.add(self)
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
+            return None
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()

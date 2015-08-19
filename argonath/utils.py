@@ -29,6 +29,8 @@ def api_need_token(f):
 def need_admin(f):
     @wraps(f)
     def _(*args, **kwargs):
+        if not g.user:
+            return redirect(openid2.login_url)
         if not g.user.is_admin():
             abort(403)
         return f(*args, **kwargs)
