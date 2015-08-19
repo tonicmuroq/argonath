@@ -3,6 +3,7 @@
 
 import etcd
 import json
+import sys
 
 
 def get_node(c, key):
@@ -38,6 +39,8 @@ def check(src):
         print node.key, v
 
 if __name__=="__main__":
-    dst = src = '127.0.0.1:4001'
+    src = sys.argv[1]
+    dst = sys.argv[2]
+    print src, dst
     main(src, dst)
-    check(src)
+    check(dst)
