@@ -4,3 +4,4 @@ python-etcd
 MySQL-python
 python-openid
 gunicorn
+netaddr
