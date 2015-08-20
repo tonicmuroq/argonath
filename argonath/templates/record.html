@@ -9,10 +9,6 @@
         <td>{{record.domain}}</td>
       </tr>
       <tr>
-        <td>地址</td>
-        <td>{{record.host}}</td>
-      </tr>
-      <tr>
         <td>所有者</td>
         <td>{{record.user.name}}</td>
       </tr>
@@ -24,8 +20,28 @@
         <td>创建时间</td>
         <td>{{record.time}}</td>
       </tr>
+   </tbody>
+  </table>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <td> Network</td>
+        <td> Host</td>
+      </tr>
+    </thead>
+    <tbody>
+    {% for net, host in record.hosts.iteritems()%}
+      {% for h in host%}
+      <tr>
+        <td>{{net}}</td>
+        <td>{{h}}</td>
+      </tr>
+      {% endfor %}
+    {% endfor %}
     </tbody>
   </table>
+
   {% if record.can_do(g.user) %}
     <div class="row">
       <label class="indent-15-px">
@@ -46,10 +62,10 @@
     </div>
     <script>
       $('.btn-danger.btn-lg').click(function(e){
+        e.preventDefault();
         if (!confirm('确定要删除么?')) {
           return;
         }
-        e.preventDefault();
         var self = $(this),
           href = self.attr('href');
         $.post(href, {}, function(){

@@ -11,10 +11,9 @@ from netaddr import IPNetwork, AddrFormatError
 
 from argonath.ext import db
 from argonath.config import ETCD_HOST, ETCD_PORT, ARGONATH_ADMIN
+from argonath.consts import DEFAULT_NET
 _etcd = etcd.Client(ETCD_HOST, ETCD_PORT)
 admin_emails = ARGONATH_ADMIN.split(',')
-
-DEFAULT_NET = "default"
 
 
 class Base(db.Model):
@@ -108,7 +107,7 @@ class Record(Base):
             return_dict = dict()
             for cidr in cidrs:
                 return_dict[cidr] = [x['host'] for x in data[cidr]]
-            return json.dumps(return_dict)
+            return return_dict
         return data
 
     def add_host(self, cidr, host_or_ip):

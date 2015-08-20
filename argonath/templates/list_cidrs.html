@@ -16,7 +16,7 @@
           <td><a href="{{url_for('admin.get_cidr', id=c.id)}}" target="_blank">{{c.name}}</a></td>
           <td>{{c.cidr}}</td>
           <td>
-            <a class="btn btn-block btn-lg btn-danger" href="{{url_for('admin.delete_cidr', id=c.id)}}">
+            <a class="btn btn-block btn-sm btn-danger" href="{{url_for('admin.delete_cidr', id=c.id)}}">
             <span class="fui-trash"></span> 删除
             </a>
           </td>
@@ -26,7 +26,7 @@
   </table>
   <div class="row">
     <div class="col-xs-3">
-      <a class="btn btn-block btn-lg btn-warning" href="{{url_for('admin.create_cidr')}}">
+      <a class="btn btn-block btn-sm btn-warning" href="{{url_for('admin.create_cidr')}}">
       <span class="fui-new"></span> NEW CIDR
       </a>
     </div>
@@ -35,7 +35,7 @@
   {{utils.paginator(g.start, total, g.limit, endpoint)}}
 
   <script>
-    $('.btn-danger.btn-lg').click(function(e){
+    $('.btn-danger.btn-sm').click(function(e){
       if (!confirm('确定要删除么?')) {
         return;
       }
