@@ -11,6 +11,7 @@ from netaddr import IPNetwork, AddrFormatError
 
 from argonath.ext import db
 from argonath.config import ETCD_HOST, ETCD_PORT, ARGONATH_ADMIN
+from argonath.consts import DEFAULT_NET
 _etcd = etcd.Client(ETCD_HOST, ETCD_PORT)
 admin_emails = ARGONATH_ADMIN.split(',')
 
@@ -64,7 +65,8 @@ class Record(Base):
             db.session.rollback()
             return None
         else:
-            _etcd.set(r.skydns_path, json.dumps({'host': host_or_ip}))
+            data = json.dumps({DEFAULT_NET: [{'host': host_or_ip}]})
+            _etcd.set(r.skydns_path, data)
             return r
 
     @classmethod
@@ -78,7 +80,7 @@ class Record(Base):
     @classmethod
     def list_records(cls, start=0, limit=20):
         """还会返回总数"""
-        q = cls.query.order_by(cls.id.desc())
+        q = cls.query.order_by(cls.name.desc())
         total = q.count()
         q = q.offset(start)
         if limit is not None:
@@ -98,11 +100,31 @@ class Record(Base):
             return {}
 
     @property
-    def host(self):
-        return self.skydns_data.get('host', '')
+    def hosts(self):
+        data = self.skydns_data
+        if data:
+            cidrs = data.keys()
+            return_dict = dict()
+            for cidr in cidrs:
+                return_dict[cidr] = [x['host'] for x in data[cidr]]
+            return return_dict
+        return data
 
-    def edit(self, host_or_ip):
-        _etcd.set(self.skydns_path, json.dumps({'host': host_or_ip}))
+    def add_host(self, cidr, host_or_ip):
+        data = self.skydns_data
+        if not data.get(cidr):
+            data[cidr] = [{'host': host_or_ip}]
+        elif host_or_ip not in [x['host'] for x in data[cidr]]:
+            data[cidr].append({'host': host_or_ip})
+        _etcd.set(self.skydns_path, json.dumps(data))
+
+    def delete_host(self, cidr, host_or_ip):
+        data = self.skydns_data
+        if data.get(cidr):
+            data[cidr] = [x for x in data[cidr] if x['host'] != host_or_ip]
+        if not data[cidr]:
+            del data[cidr]
+        _etcd.set(self.skydns_path, json.dumps(data))
 
     def can_do(self, user):
         return user and (self.user.id == user.id or user.is_admin())
@@ -114,7 +136,7 @@ class Record(Base):
 
     def to_dict(self):
         d = super(Record, self).to_dict()
-        d['host'] = self.host
+        d['host'] = self.hosts
         return d
 
 
@@ -212,17 +234,23 @@ class CIDR(Base):
             c = cls(name, str(net))
             db.session.add(c)
             db.session.commit()
+            return c
         except sqlalchemy.exc.IntegrityError:
             db.session.rollback()
             return None
 
     @classmethod
     def get_by_name(cls, name):
-        cls.query.filter(cls.name == name).first()
+        return cls.query.filter(cls.name == name).first()
 
     @classmethod
-    def list_records(cls, start=0, limit=20):
-        return cls.query.order_by(cls.id.desc()).all()
+    def list_cidrs(cls, start=0, limit=20):
+        q = cls.query.order_by(cls.id.desc())
+        total = q.count()
+        q = q.offset(start)
+        if limit is not None:
+            q = q.limit(limit)
+        return q.all(), total
 
     def edit(self, name, cidr):
         try:
@@ -234,6 +262,7 @@ class CIDR(Base):
             self.cidr=cidr
             db.session.add(self)
             db.session.commit()
+            return self
         except sqlalchemy.exc.IntegrityError:
             db.session.rollback()
             return None

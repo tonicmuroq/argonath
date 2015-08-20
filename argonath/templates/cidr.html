@@ -1,0 +1,50 @@
+{% extends "/base.html" %}
+{% import "/utils.html" as utils %}
+
+{% block main %}
+  <table class="table table-striped">
+    <tbody>
+      <tr>
+        <td>Network Name</td>
+        <td>{{cidr.name}}</td>
+      </tr>
+      <tr>
+        <td>CIDR</td>
+        <td>{{cidr.cidr}}</td>
+      </tr>
+      <tr>
+        <td>创建时间</td>
+        <td>{{cidr.time}}</td>
+      </tr>
+    </tbody>
+  </table>
+   <div class="row">
+      <div class="col-xs-3">
+        <a class="btn btn-block btn-lg btn-warning" href="{{url_for('admin.edit_cidr', id=cidr.id)}}">
+          <span class="fui-new"></span> 修改
+        </a>
+      </div>
+      <div class="col-xs-3">
+        <a class="btn btn-block btn-lg btn-danger" href="{{url_for('admin.delete_cidr', id=cidr.id)}}">
+          <span class="fui-trash"></span> 删除
+        </a>
+      </div>
+    </div>
+    <script>
+      $('.btn-danger.btn-lg').click(function(e){
+        if (!confirm('确定要删除么?')) {
+          return;
+        }
+        e.preventDefault();
+        var self = $(this),
+          href = self.attr('href');
+        $.post(href, {}, function(){
+          window.location.href = "{{url_for('admin.cidrs_show')}}";
+        });
+      })
+    </script>
+{% endblock %}
+
+{% block more_css %}
+  .indent-15-px { margin-left: 15px; }
+{% endblock %}

@@ -12,6 +12,9 @@ def flushdb(app):
     with app.app_context():
         db.drop_all()
         db.create_all()
+        c = CIDR.create('default', 'default')
+        db.session.add(c)
+        db.session.commit()
 
 if __name__ == '__main__':
     app = create_app()
