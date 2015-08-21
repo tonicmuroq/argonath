@@ -89,6 +89,8 @@ def delete_cidr(id):
     c = CIDR.get(id)
     if not c:
         abort(404)
+    if c.is_default():
+        abort(400)
     c.delete()
     return redirect(url_for('admin.cidrs_show'))
 
@@ -106,6 +108,8 @@ def edit_cidr(id):
     c = CIDR.get(id)
     if not c:
         abort(404)
+    if c.is_default():
+        abort(400)
     if request.method == 'GET':
         return render_template('edit_cidr.html', cidr=c)
     name = request.form.get('name', type=str, default='').strip()

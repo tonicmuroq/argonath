@@ -266,6 +266,9 @@ class CIDR(Base):
         q = cls.query.order_by(cls.id.desc())
         return q[start:start+limit], q.count()
 
+    def is_default(self):
+        return self.name == DEFAULT_NET
+
     def edit(self, name, cidr):
         try:
             IPNetwork(cidr)

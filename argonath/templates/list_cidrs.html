@@ -1,6 +1,10 @@
 {% extends "/base.html" %}
 {% import "/utils.html" as utils %}
 
+{% block more_css %}
+  div.row {margin-bottom: 15px;}
+{% endblock %}
+
 {% block main %}
   <table class="table table-striped">
     <thead>
@@ -11,7 +15,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for c in cidrs %}
+      {% for c in cidrs if not c.is_default() %}
         <tr>
           <td><a href="{{url_for('admin.get_cidr', id=c.id)}}" target="_blank">{{c.name}}</a></td>
           <td>{{c.cidr}}</td>
