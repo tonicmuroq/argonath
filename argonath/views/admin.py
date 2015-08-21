@@ -63,7 +63,7 @@ def transfer(username):
 
 @bp.route('/cidrs/')
 def cidrs_show():
-    cidrs, total = CIDR.list_cidrs()
+    cidrs, total = CIDR.list_cidrs(g.start, g.limit)
     return render_template('list_cidrs.html', cidrs=cidrs, total=total, endpoint='admin.cidrs_show')
 
 @bp.route('/cidrs/add/', methods=['GET', 'POST'])

@@ -5,15 +5,20 @@ import etcd
 import json
 import datetime
 import sqlalchemy.exc
+
 from etcd import EtcdKeyError
-from sqlalchemy.ext.declarative import declared_attr
 from netaddr import IPNetwork, AddrFormatError
+from sqlalchemy.ext.declarative import declared_attr
 
 from argonath.ext import db
-from argonath.config import ETCD_HOST, ETCD_PORT, ARGONATH_ADMIN
+from argonath.config import ETCD_HOST, ETCD_PORT
+from argonath.config import ETCD_HOST_BACKUP, ETCD_PORT_BACKUP
 from argonath.consts import DEFAULT_NET
+
 _etcd = etcd.Client(ETCD_HOST, ETCD_PORT)
-admin_emails = ARGONATH_ADMIN.split(',')
+_etcd_backup = None
+if ETCD_HOST_BACKUP and ETCD_PORT_BACKUP:
+    _etcd_backup = etcd.Client(ETCD_HOST_BACKUP, ETCD_PORT_BACKUP)
 
 
 class Base(db.Model):
@@ -66,7 +71,11 @@ class Record(Base):
             return None
         else:
             data = json.dumps({DEFAULT_NET: [{'host': host_or_ip}]})
+
             _etcd.set(r.skydns_path, data)
+            if _etcd_backup:
+                _etcd_backup.set(r.skydns_path, data)
+
             return r
 
     @classmethod
@@ -104,7 +113,7 @@ class Record(Base):
         data = self.skydns_data
         if data:
             cidrs = data.keys()
-            return_dict = dict()
+            return_dict = {}
             for cidr in cidrs:
                 return_dict[cidr] = [x['host'] for x in data[cidr]]
             return return_dict
@@ -116,7 +125,10 @@ class Record(Base):
             data[cidr] = [{'host': host_or_ip}]
         elif host_or_ip not in [x['host'] for x in data[cidr]]:
             data[cidr].append({'host': host_or_ip})
+
         _etcd.set(self.skydns_path, json.dumps(data))
+        if _etcd_backup:
+            _etcd_backup.set(self.skydns_path, json.dumps(data))
 
     def delete_host(self, cidr, host_or_ip):
         data = self.skydns_data
@@ -124,13 +136,19 @@ class Record(Base):
             data[cidr] = [x for x in data[cidr] if x['host'] != host_or_ip]
         if not data[cidr]:
             del data[cidr]
+
         _etcd.set(self.skydns_path, json.dumps(data))
+        if _etcd_backup:
+            _etcd_backup.set(self.skydns_path, json.dumps(data))
 
     def can_do(self, user):
-        return user and (self.user.id == user.id or user.is_admin())
+        return user and (self.user_id == user.id or user.is_admin())
 
     def delete(self):
         _etcd.delete(self.skydns_path)
+        if _etcd_backup:
+            _etcd_backup.delete(self.skydns_path)
+
         db.session.delete(self)
         db.session.commit()
 
@@ -246,11 +264,7 @@ class CIDR(Base):
     @classmethod
     def list_cidrs(cls, start=0, limit=20):
         q = cls.query.order_by(cls.id.desc())
-        total = q.count()
-        q = q.offset(start)
-        if limit is not None:
-            q = q.limit(limit)
-        return q.all(), total
+        return q[start:start+limit], q.count()
 
     def edit(self, name, cidr):
         try:
