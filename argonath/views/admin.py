@@ -18,8 +18,8 @@ def index():
 def create_record():
     if request.method == 'GET':
         return render_template('admin_record.html')
-    name = request.form.get('name', type=str, default='').strip()
-    host_or_ip = request.form.get('host', type=str, default='').strip()
+    name = request.form.get('name', default='').strip()
+    host_or_ip = request.form.get('host', default='').strip()
     if len(name) < 3:
         flash(u'域名长度必须大于3', 'error')
         return redirect(url_for('admin.create_record'))
@@ -71,8 +71,8 @@ def cidrs_show():
 def create_cidr():
     if request.method == 'GET':
         return render_template(('create_cidr.html'))
-    name = request.form.get('name', type=str, default='').strip()
-    cidr = request.form.get('cidr', type=str, default='').strip()
+    name = request.form.get('name', default='').strip()
+    cidr = request.form.get('cidr', default='').strip()
     c = CIDR.get_by_name(name)
     if c:
         flash(u'Network name already exist.', 'info')
@@ -97,6 +97,7 @@ def delete_cidr(id):
 @bp.route('/cidrs/<id>/')
 def get_cidr(id):
     c = CIDR.get(id)
+    print c.name
     if c:
         return render_template('cidr.html', cidr=c)
     flash('no cidr with this id', 'error')
@@ -112,8 +113,8 @@ def edit_cidr(id):
         abort(400)
     if request.method == 'GET':
         return render_template('edit_cidr.html', cidr=c)
-    name = request.form.get('name', type=str, default='').strip()
-    cidr = request.form.get('cidr', type=str, default='').strip()
+    name = request.form.get('name', default='').strip()
+    cidr = request.form.get('cidr', default='').strip()
     result = c.edit(name=name, cidr=cidr)
     if not result:
         flash("edit failure", 'error')
