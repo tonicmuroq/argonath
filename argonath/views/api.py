@@ -32,7 +32,7 @@ def get_record(record_id):
 @bp.route('/record/search/')
 @jsonize
 def query_record():
-    query = request.args.get('q', type=str, default='')
+    query = request.args.get('q', default='')
     r = Record.get_by_name(query)
     if not r:
         abort(404, u'没有找到记录')
@@ -42,12 +42,12 @@ def query_record():
 @jsonize
 @api_need_token
 def create_record():
-    name = request.form.get('name', type=str, default='').strip()
-    host_or_ip = request.form.get('host', type=str, default='').strip()
+    name = request.form.get('name', default='').strip()
+    host_or_ip = request.form.get('host', default='').strip()
 
     # 给跪了, 不是admin就判断subname什么的
     if not g.user.is_admin():
-        subname = request.form.get('subname', type=str, default='').strip()
+        subname = request.form.get('subname', default='').strip()
         if len(name) < 5 and not g.user.is_admin():
             abort(400, u'域名长度必须大于5')
         if '.' in name:
@@ -80,7 +80,7 @@ def edit_record(record_id):
     if not record.can_do(g.user):
         abort(403, u'没有权限编辑这个记录')
 
-    host_or_ip = request.form.get('host', type=str, default='').strip()
+    host_or_ip = request.form.get('host', default='').strip()
     if not host_or_ip:
         abort(400, u'必须填写一个host')
 

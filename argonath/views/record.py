@@ -32,7 +32,7 @@ def get_record(record_id):
 
 @bp.route('/search/')
 def query_record():
-    query = request.args.get('q', type=str, default='')
+    query = request.args.get('q', default='')
     r = Record.get_by_name(query)
     if not r:
         abort(404)
@@ -43,9 +43,9 @@ def query_record():
 def create_record():
     if request.method == 'GET':
         return render_template('create_record.html', sub_domains=sub_domains)
-    name = request.form.get('name', type=str, default='').strip()
-    subname = request.form.get('subname', type=str, default='').strip()
-    host_or_ip = request.form.get('host', type=str, default='').strip()
+    name = request.form.get('name', default='').strip()
+    subname = request.form.get('subname', default='').strip()
+    host_or_ip = request.form.get('host', default='').strip()
 
     if len(name) < 5 and not g.user.is_admin():
         flash(u'域名长度必须大于5', 'error')
@@ -91,8 +91,8 @@ def add_host_to_record(record_id):
         abort(404)
     if not record.can_do(g.user):
         abort(403)
-    cidr = request.form.get('cidr', type=str, default='').strip()
-    host_or_ip = request.form.get('host', type=str, default='').strip()
+    cidr = request.form.get('cidr', default='').strip()
+    host_or_ip = request.form.get('host', default='').strip()
     if not host_or_ip:
         flash(u'必须填写一个host', 'error')
         return redirect(url_for('record.edit_record', record_id=record.id))
@@ -110,8 +110,8 @@ def delete_host_from_record(record_id):
         abort(404)
     if not record.can_do(g.user):
         abort(403)
-    cidr = request.form.get('cidr', type=str, default='').strip()
-    host_or_ip = request.form.get('host', type=str, default='').strip()
+    cidr = request.form.get('cidr', default='').strip()
+    host_or_ip = request.form.get('host', default='').strip()
     print cidr, host_or_ip
     if not cidr:
         flash(u'Where is CIDR???')
