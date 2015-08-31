@@ -39,7 +39,7 @@
         var cidr = self.data('net');
         var host = self.data('host');
         $.post(href, {'cidr': cidr, 'host': host}, function(){
-          window.location.href = '/';
+          window.location.href = "{{ url_for('record.get_record', record_id=record.id) }}";
         });
       });
     </script>
