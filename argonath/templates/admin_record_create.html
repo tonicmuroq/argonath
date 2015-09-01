@@ -2,20 +2,20 @@
 {% import "/utils.html" as utils %}
 
 {% block main %}
-  <form class="form-horizontal" method="post" action="{{url_for('admin.create_record')}}">
+  <form class="form-horizontal" method="post" action="{{url_for('admin_record.create')}}">
     <div class="form-group">
       <label class="col-sm-2 control-label">域名</label>
       <div class="col-sm-2">
         <input name="name" type="text" class="form-control" placeholder="域名, 如argonath">
       </div>
-      <div class="col-sm-2">
+     <div class="col-sm-2">
         <span>.hunantv.com</span>
       </div>
     </div>
     <div class="form-group">
       <label class="col-sm-2 control-label">地址</label>
       <div class="col-sm-4">
-        <input name="host" type="text" class="form-control" placeholder="地址, 如10.1.201.47, 或者redis-ctl.hunantv.com">
+        <input name="host" type="text" class="form-control" placeholder="地址, 如10.1.201.47, 或者redis-ctl.intra.hunantv.com">
       </div>
     </div>
     {% with errors = get_flashed_messages(category_filter=['error'])%}
@@ -31,7 +31,7 @@
     {% endwith %}
     <div class="form-group">
       <div class="col-sm-offset-2 col-sm-4">
-        <button type="submit" class="btn btn-primary">去吧皮卡丘!</button>
+        <button type="submit" class="btn btn-primary">就决定是你了!</button>
       </div>
     </div>
   </form>

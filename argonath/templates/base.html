@@ -50,12 +50,12 @@
                     <a href="{{url_for('admin.index')}}"><span class="fui-exit"></span> 域名回收</a>
                   </li>
                   <li class="divider"></li>
-                  <li class="{{'active' if request.path == url_for('admin.create_record') else ''}}">
-                    <a href="{{url_for('admin.create_record')}}"><span class="fui-calendar-solid"></span> 创建admin域名</a>
+                  <li class="{{'active' if request.path == url_for('admin_record.create') else ''}}">
+                    <a href="{{url_for('admin_record.create')}}"><span class="fui-calendar-solid"></span> 创建admin域名</a>
                   </li>
                   <li class="divider"></li>
-                  <li class="{{'active' if request.path == url_for('admin.list_my_records') else ''}}">
-                    <a href="{{url_for('admin.list_my_records')}}"><span class="fui-list-numbered"></span> 查看admin域名</a>
+                  <li class="{{'active' if request.path == url_for('admin_record.list_my_records') else ''}}">
+                    <a href="{{url_for('admin_record.list_my_records')}}"><span class="fui-list-numbered"></span> 查看admin域名</a>
                   </li>
                   <li class="{{'active' if request.path == url_for('admin.cidrs_show') else ''}}">
                     <a href="{{url_for('admin.cidrs_show')}}"><span class="fui-location"></span> CIDR</a>
