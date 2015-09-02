@@ -14,8 +14,8 @@ bp = Blueprint('admin_record', __name__, url_prefix='/admin/record')
 def create():
     if request.method == 'GET':
         return render_template('admin_record_create.html')
-    name = request.form.get('name', type=str, default='').strip()
-    host_or_ip = request.form.get('host', type=str, default='').strip()
+    name = request.form.get('name', default='').strip()
+    host_or_ip = request.form.get('host', default='').strip()
 
     if len(name) < 3:
         flash(u'域名长度必须大于3', 'error')

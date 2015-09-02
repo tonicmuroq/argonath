@@ -13,7 +13,7 @@ def index():
     users = User.list_users(g.start, g.limit)
     return render_template('admin.html', user=g.user, users=users)
 
-@bp.route('/user_records/<username>/')
+bp.route('/user_records/<username>/')
 @need_login
 def user_records(username):
     user = User.get_by_name(username)
@@ -30,7 +30,7 @@ def transfer(username):
 
 @bp.route('/cidrs/')
 def cidrs_show():
-    cidrs, total = CIDR.list_cidrs()
+    cidrs, total = CIDR.list_cidrs(g.start, g.limit)
     return render_template('list_cidrs.html', cidrs=cidrs, total=total, endpoint='admin.cidrs_show')
 
 @bp.route('/cidrs/add/', methods=['GET', 'POST'])
@@ -38,8 +38,8 @@ def cidrs_show():
 def create_cidr():
     if request.method == 'GET':
         return render_template(('create_cidr.html'))
-    name = request.form.get('name', type=str, default='').strip()
-    cidr = request.form.get('cidr', type=str, default='').strip()
+    name = request.form.get('name', default='').strip()
+    cidr = request.form.get('cidr', default='').strip()
     c = CIDR.get_by_name(name)
     if c:
         flash(u'Network name already exist.', 'info')
@@ -56,12 +56,15 @@ def delete_cidr(id):
     c = CIDR.get(id)
     if not c:
         abort(404)
+    if c.is_default():
+        abort(400)
     c.delete()
     return redirect(url_for('admin.cidrs_show'))
 
 @bp.route('/cidrs/<id>/')
 def get_cidr(id):
     c = CIDR.get(id)
+    print c.name
     if c:
         return render_template('cidr.html', cidr=c)
     flash('no cidr with this id', 'error')
@@ -73,10 +76,12 @@ def edit_cidr(id):
     c = CIDR.get(id)
     if not c:
         abort(404)
+    if c.is_default():
+        abort(400)
     if request.method == 'GET':
         return render_template('edit_cidr.html', cidr=c)
-    name = request.form.get('name', type=str, default='').strip()
-    cidr = request.form.get('cidr', type=str, default='').strip()
+    name = request.form.get('name', default='').strip()
+    cidr = request.form.get('cidr', default='').strip()
     result = c.edit(name=name, cidr=cidr)
     if not result:
         flash("edit failure", 'error')
