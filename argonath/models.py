@@ -11,14 +11,17 @@ from netaddr import IPNetwork, AddrFormatError
 from sqlalchemy.ext.declarative import declared_attr
 
 from argonath.ext import db
-from argonath.config import ETCD_HOST, ETCD_PORT
-from argonath.config import ETCD_HOST_BACKUP, ETCD_PORT_BACKUP
+from argonath.config import ETCDS
 from argonath.consts import DEFAULT_NET
 
-_etcd = etcd.Client(ETCD_HOST, ETCD_PORT)
-_etcd_backup = None
-if ETCD_HOST_BACKUP and ETCD_PORT_BACKUP:
-    _etcd_backup = etcd.Client(ETCD_HOST_BACKUP, ETCD_PORT_BACKUP)
+
+def _get_host_port(s):
+    h, p = s.split(':')
+    return h, int(p)
+
+
+_etcd_machines = [_get_host_port(host) for host in ETCDS.split(',')]
+_etcd = etcd.Client(tuple(_etcd_machines), allow_reconnect=True)
 
 
 class Base(db.Model):
@@ -73,8 +76,6 @@ class Record(Base):
             data = json.dumps({DEFAULT_NET: [{'host': host_or_ip}]})
 
             _etcd.set(r.skydns_path, data)
-            if _etcd_backup:
-                _etcd_backup.set(r.skydns_path, data)
 
             return r
 
@@ -127,8 +128,6 @@ class Record(Base):
             data[cidr].append({'host': host_or_ip})
 
         _etcd.set(self.skydns_path, json.dumps(data))
-        if _etcd_backup:
-            _etcd_backup.set(self.skydns_path, json.dumps(data))
 
     def delete_host(self, cidr, host_or_ip):
         data = self.skydns_data
@@ -138,16 +137,12 @@ class Record(Base):
             del data[cidr]
 
         _etcd.set(self.skydns_path, json.dumps(data))
-        if _etcd_backup:
-            _etcd_backup.set(self.skydns_path, json.dumps(data))
 
     def can_do(self, user):
         return user and (self.user_id == user.id or user.is_admin())
 
     def delete(self):
         _etcd.delete(self.skydns_path)
-        if _etcd_backup:
-            _etcd_backup.delete(self.skydns_path)
 
         db.session.delete(self)
         db.session.commit()

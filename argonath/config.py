@@ -8,10 +8,7 @@ MYSQL_USER = os.getenv('MYSQL_USER', 'root')
 MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD', '')
 MYSQL_DATABASE = os.getenv('MYSQL_DATABASE', 'argonath')
 
-ETCD_HOST = os.getenv('ETCD_HOST', 'localhost')
-ETCD_PORT = int(os.getenv('ETCD_PORT', '4001'))
-ETCD_HOST_BACKUP = os.getenv('ETCD_HOST_BACKUP', '')
-ETCD_PORT_BACKUP = int(os.getenv('ETCD_PORT_BACKUP', '0'))
+ETCDS = os.getenv('ETCDS', 'localhost:4001')
 
 SQLALCHEMY_POOL_SIZE = 100
 SQLALCHEMY_POOL_TIMEOUT = 10
