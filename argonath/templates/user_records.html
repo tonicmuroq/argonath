@@ -6,9 +6,11 @@
   <div class='span3'>
     用户名 {{user.name}}
   </div>
+  {% if g.user.name != user.name %}
   <div class='span3'>
       <a href={{url_for('admin.transfer', username=user.name)}} class="btn btn-lg btn-danger">把它的域名搞过来</a>
   </div>
+  {% endif %}
 </div>
 
 <table class="table table-striped">
@@ -41,6 +43,5 @@
       });
     })
   </script>
-
 
 {% endblock %}

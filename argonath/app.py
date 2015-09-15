@@ -15,6 +15,7 @@ blueprints = (
     'record',
     'api',
     'admin',
+    'admin_record'
 )
 
 def create_app():
