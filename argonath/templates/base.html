@@ -57,6 +57,7 @@
                   <li class="{{'active' if request.path == url_for('admin.list_my_records') else ''}}">
                     <a href="{{url_for('admin.list_my_records')}}"><span class="fui-list-numbered"></span> 查看admin域名</a>
                   </li>
+                  <li class="divider"></li>
                   <li class="{{'active' if request.path == url_for('admin.cidrs_show') else ''}}">
                     <a href="{{url_for('admin.cidrs_show')}}"><span class="fui-location"></span> CIDR</a>
                   </li>
