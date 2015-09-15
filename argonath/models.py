@@ -90,7 +90,7 @@ class Record(Base):
     @classmethod
     def list_records(cls, start=0, limit=20):
         """还会返回总数"""
-        q = cls.query.order_by(cls.name.desc())
+        q = cls.query.order_by(cls.id.desc())
         total = q.count()
         q = q.offset(start)
         if limit is not None:
