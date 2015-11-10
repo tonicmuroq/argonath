@@ -56,10 +56,11 @@ def create_record():
             abort(400, u'不正确的子域名')
         domain = name + '.' + subname + '.hunantv.com'
     # 是admin就很暴力了...
+    # 可以随便传域名的哦...
     else:
         if name.startswith('.') or name.endswith('.'):
             abort(400, u'域名不能以"."开始或者结束, 并不是dnspod啊  (￣▽￣")')
-        domain = name + '.hunantv.com'
+        domain = name
 
     r = Record.get_by_domain(domain)
     if r:
@@ -103,7 +104,7 @@ def delete_record(record_id):
 def init_global_vars():
     token = request.args.get('token')
     if not token:
-        token = request.headers.get('token', '')
+        token = request.headers.get('X-Argonath-Token', '')
     g.user = User.get_by_token(token)
 
 @bp.errorhandler(400)

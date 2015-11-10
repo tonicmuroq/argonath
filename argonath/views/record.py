@@ -7,7 +7,6 @@ from argonath.models import Record, CIDR
 from argonath.utils import need_login
 from argonath.consts import sub_domains
 
-
 bp = Blueprint('record', __name__, url_prefix='/record')
 
 @bp.route('/all/')
@@ -110,18 +109,17 @@ def delete_host_from_record(record_id):
         abort(404)
     if not record.can_do(g.user):
         abort(403)
+
     cidr = request.form.get('cidr', default='').strip()
     host_or_ip = request.form.get('host', default='').strip()
-    print cidr, host_or_ip
     if not cidr:
-        flash(u'Where is CIDR???')
+        flash(u'没有CIDR', 'error')
         return redirect(url_for('record.edit_record', record_id=record.id))
     if not host_or_ip:
         flash(u'必须填写一个host', 'error')
         return redirect(url_for('record.edit_record', record_id=record.id))
     record.delete_host(cidr, host_or_ip)
     return redirect(url_for('record.edit_record', record_id=record.id))
-
 
 @bp.route('/<record_id>/delete/', methods=['POST'])
 @need_login
@@ -136,5 +134,5 @@ def delete_record(record_id):
 
 @bp.errorhandler(403)
 @bp.errorhandler(404)
-def error_403_404_handler(e):
+def error_handler(e):
     return render_template('%s.html' % e.code), e.code
