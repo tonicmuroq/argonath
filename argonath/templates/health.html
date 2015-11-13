@@ -1,0 +1,13 @@
+{% extends "/base.html" %}
+{% import "/utils.html" as utils %}
+
+{% block main %}
+  <ul class="list-group">
+    {% for nodename, r in health_info.iteritems() %}
+    <li class="btn btn-{{r and 'success' or 'danger'}}">{{nodename}}</li>
+    {% endfor %}
+  </ul>
+{% endblock %}
+
+{% block more_css %}
+{% endblock %}

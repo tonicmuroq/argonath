@@ -3,6 +3,7 @@
 import os
 import etcd
 import json
+import requests
 import datetime
 import sqlalchemy.exc
 
@@ -22,6 +23,21 @@ def _get_host_port(s):
 
 _etcd_machines = [_get_host_port(host) for host in ETCDS.split(',')]
 _etcd = etcd.Client(tuple(_etcd_machines), allow_reconnect=True)
+
+
+def health_check():
+    rs = {}
+    for nodename, nodeinfo in _etcd.members.iteritems():
+        if not nodeinfo['clientURLs']:
+            rs[nodename] = False
+            continue
+        try:
+            url = nodeinfo['clientURLs'][0]
+            r = requests.get(url + '/health', timeout=3)
+            rs[nodename] = json.loads(r.content)['health']
+        except:
+            rs[nodename] = False
+    return rs
 
 
 class Base(db.Model):

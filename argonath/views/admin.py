@@ -3,7 +3,7 @@
 from flask import url_for, redirect, g, render_template, Blueprint, flash, request, abort
 
 from argonath.utils import need_admin
-from argonath.models import User, Record, CIDR
+from argonath.models import User, Record, CIDR, health_check
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -113,6 +113,11 @@ def edit_cidr(id):
         return redirect(url_for('admin.edit_cidr', id=c.id))
     flash("edit success", 'info')
     return redirect(url_for('admin.get_cidr', id=c.id))
+
+@bp.route('/health/', methods=['GET'])
+def health():
+    health_info = health_check()
+    return render_template('health.html', health_info=health_info)
 
 @bp.errorhandler(403)
 @bp.errorhandler(404)

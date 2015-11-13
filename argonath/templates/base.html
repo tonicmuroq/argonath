@@ -61,6 +61,10 @@
                   <li class="{{'active' if request.path == url_for('admin.cidrs_show') else ''}}">
                     <a href="{{url_for('admin.cidrs_show')}}"><span class="fui-location"></span> CIDR</a>
                   </li>
+                  <li class="divider"></li>
+                  <li class="{{'active' if request.path == url_for('admin.health') else ''}}">
+                    <a href="{{url_for('admin.health')}}"><span class="fui-time"></span> Health Check</a>
+                  </li>
                 </ul>
             </li>
           {% endif %}
