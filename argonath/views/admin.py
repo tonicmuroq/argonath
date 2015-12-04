@@ -19,6 +19,7 @@ def create_record():
 
     domain = request.form.get('name', default='').strip()
     host_or_ip = request.form.get('host', default='').strip()
+    comment = request.form.get('comment', default='').strip()
 
     if domain.startswith('.') or domain.endswith('.'):
         flash(u'域名不能以"."开始或者结束, 并不是dnspod啊 (￣▽￣")', 'error')
@@ -29,7 +30,7 @@ def create_record():
         flash(u'域名已经存在, 可以编辑', 'info')
         return redirect(url_for('record.edit_record', record_id=r.id))
 
-    r = Record.create(g.user, domain, domain, host_or_ip)
+    r = Record.create(g.user, domain, domain, host_or_ip, comment)
     if not r:
         flash(u'创建失败', 'error')
         return redirect(url_for('admin.create_record'))

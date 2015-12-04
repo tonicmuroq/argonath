@@ -44,6 +44,7 @@ def query_record():
 def create_record():
     name = request.form.get('name', default='').strip()
     host_or_ip = request.form.get('host', default='').strip()
+    comment = request.form.get('comment', default='').strip()
 
     # 给跪了, 不是admin就判断subname什么的
     if not g.user.is_admin():
@@ -66,7 +67,7 @@ def create_record():
     if r:
         abort(400, u'记录已经存在, 你可以尝试编辑')
 
-    r = Record.create(g.user, name, domain, host_or_ip)
+    r = Record.create(g.user, name, domain, host_or_ip, comment)
     if not r:
         abort(400, u'创建失败, 别问我为什么是400... o(￣ヘ￣*o)')
     return {'r': 0, 'message': 'ok', 'data': r}
@@ -75,18 +76,19 @@ def create_record():
 @jsonize
 @api_need_token
 def edit_record(record_id):
-    record = Record.get(record_id)
-    if not record:
-        abort(400, u'没有找到记录')
-    if not record.can_do(g.user):
-        abort(403, u'没有权限编辑这个记录')
+    return {'r': 1, 'message': u'接口已经被弃用'}
+    # record = Record.get(record_id)
+    # if not record:
+    #     abort(400, u'没有找到记录')
+    # if not record.can_do(g.user):
+    #     abort(403, u'没有权限编辑这个记录')
 
-    host_or_ip = request.form.get('host', default='').strip()
-    if not host_or_ip:
-        abort(400, u'必须填写一个host')
+    # host_or_ip = request.form.get('host', default='').strip()
+    # if not host_or_ip:
+    #     abort(400, u'必须填写一个host')
 
-    record.edit(host_or_ip)
-    return {'r': 0, 'message': 'ok', 'data': record}
+    # record.edit(host_or_ip)
+    # return {'r': 0, 'message': 'ok', 'data': record}
 
 @bp.route('/record/<record_id>/', methods=['DELETE'])
 @jsonize

@@ -8,6 +8,7 @@
     <tr>
       <td> Network</td>
       <td> Host</td>
+      <td> Comment</td>
       <td> Ops</td>
     </tr>
   </thead>
@@ -18,6 +19,7 @@
         <tr>
           <td>{{net}}</td>
           <td>{{h}}</td>
+          <td>{{comments[host]}}</td>
           <td>
             <div class="col-xs-4">
               <button class="btn btn-block btn-sm btn-danger" data-net="{{ net }}" data-host="{{ h }}">
@@ -79,6 +81,12 @@
       <label class="col-sm-2 control-label">地址</label>
       <div class="col-sm-4">
         <input name="host" type="text" class="form-control" placeholder="地址, 如10.1.201.47, 或者redis-ctl.intra.hunantv.com">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-sm-2 control-label">备注</label>
+      <div class="col-sm-4">
+        <input name="comment" type="text" class="form-control" placeholder="">
       </div>
     </div>
     {% with errors = get_flashed_messages(category_filter=['error'])%}

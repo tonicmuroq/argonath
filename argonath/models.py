@@ -72,13 +72,14 @@ class Record(Base):
     domain = db.Column(db.String(255), unique=True, nullable=False, default='')
     time = db.Column(db.DateTime, default=datetime.datetime.now)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    comments = db.Column(db.Text, default='{}')
 
     def __init__(self, name, domain):
         self.name = name
         self.domain = domain
 
     @classmethod
-    def create(cls, user, name, domain, host_or_ip):
+    def create(cls, user, name, domain, host_or_ip, comment=''):
         """目前只支持A记录和CNAME"""
         try:
             r = cls(name, domain)
@@ -92,6 +93,7 @@ class Record(Base):
             data = json.dumps({DEFAULT_NET: [{'host': host_or_ip}]})
 
             _etcd.set(r.skydns_path, data)
+            r.set_comment(host_or_ip, comment)
 
             return r
 
@@ -136,7 +138,24 @@ class Record(Base):
             return return_dict
         return data
 
-    def add_host(self, cidr, host_or_ip):
+    def get_comments(self):
+        return json.loads(self.comments)
+
+    def set_comment(self, host_or_ip, comment=''):
+        comments = self.get_comments()
+        comments[host_or_ip] = comment
+        self.comments = json.dumps(comments)
+        db.session.add(self)
+        db.session.commit()
+
+    def delete_comment(self, host_or_ip):
+        comments = self.get_comments()
+        comments.pop(host_or_ip, None)
+        self.comments = json.dumps(comments)
+        db.session.add(self)
+        db.session.commit()
+
+    def add_host(self, cidr, host_or_ip, comment=''):
         data = self.skydns_data
         if not data.get(cidr):
             data[cidr] = [{'host': host_or_ip}]
@@ -144,6 +163,7 @@ class Record(Base):
             data[cidr].append({'host': host_or_ip})
 
         _etcd.set(self.skydns_path, json.dumps(data))
+        self.set_comment(host_or_ip, comment)
 
     def delete_host(self, cidr, host_or_ip):
         data = self.skydns_data
@@ -153,6 +173,7 @@ class Record(Base):
             del data[cidr]
 
         _etcd.set(self.skydns_path, json.dumps(data))
+        self.delete_comment(host_or_ip)
 
     def can_do(self, user):
         return user and (self.user_id == user.id or user.is_admin())

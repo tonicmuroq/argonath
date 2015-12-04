@@ -27,7 +27,8 @@ def get_record(record_id):
     record = Record.get(record_id)
     if not record:
         abort(404)
-    return render_template('record.html', record=record)
+    comments = record.get_comments()
+    return render_template('record.html', record=record, comments=comments)
 
 @bp.route('/search/')
 def query_record():
@@ -45,6 +46,7 @@ def create_record():
     name = request.form.get('name', default='').strip()
     subname = request.form.get('subname', default='').strip()
     host_or_ip = request.form.get('host', default='').strip()
+    comment = request.form.get('comment', default='').strip()
 
     if len(name) < 5 and not g.user.is_admin():
         flash(u'域名长度必须大于5', 'error')
@@ -65,7 +67,7 @@ def create_record():
             return redirect(url_for('record.edit_record', record_id=r.id))
         abort(403)
 
-    r = Record.create(g.user, name, domain, host_or_ip)
+    r = Record.create(g.user, name, domain, host_or_ip, comment)
     if not r:
         flash(u'创建失败', 'error')
         return redirect(url_for('record.create_record'))
@@ -80,7 +82,9 @@ def edit_record(record_id):
         abort(404)
     if not record.can_do(g.user):
         abort(403)
-    return render_template('edit_record.html', record=record, cidrs=cidrs)
+
+    comments = record.get_comments()
+    return render_template('edit_record.html', record=record, cidrs=cidrs, comments=comments)
 
 @bp.route('/<record_id>/hosts/add/', methods=['POST'])
 @need_login
@@ -92,13 +96,14 @@ def add_host_to_record(record_id):
         abort(403)
     cidr = request.form.get('cidr', default='').strip()
     host_or_ip = request.form.get('host', default='').strip()
+    comment = request.form.get('comment', default='').strip()
     if not host_or_ip:
         flash(u'必须填写一个host', 'error')
         return redirect(url_for('record.edit_record', record_id=record.id))
     if not cidr:
         flash(u'Where is CIDR???', 'error')
         return redirect(url_for('record.edit_record', record_id=record.id))
-    record.add_host(cidr, host_or_ip)
+    record.add_host(cidr, host_or_ip, comment)
     return redirect(url_for('record.get_record', record_id=record.id))
 
 @bp.route('/<record_id>/hosts/delete/', methods=['POST'])
