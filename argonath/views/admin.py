@@ -3,7 +3,7 @@
 from flask import url_for, redirect, g, render_template, Blueprint, flash, request, abort
 
 from argonath.utils import need_admin
-from argonath.models import User, Record, CIDR, health_check
+from argonath.models import User, Record, CIDR, Domain, health_check
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -54,6 +54,36 @@ def transfer(username):
     User.transfer(source_user, g.user)
     flash(u'转移了{0}的域名'.format(username))
     return redirect(url_for('admin.index'))
+
+@bp.route('/domain/')
+def domain_show():
+    domains, total = Domain.list_domains()
+    return render_template('list_domains.html', domains=domains, total=total, endpoint='admin.domain_show')
+
+@bp.route('/domain/add', methods=['GET', 'POST'])
+def create_domain():
+    if request.method == 'GET':
+        return render_template('create_domain.html')
+
+    domain = request.form.get('domain').strip()
+    d = Domain.get_by_name(domain)
+    if d:
+        flash(u'Domain already exist.', 'info')
+        return redirect(url_for('admin.create_domain'))
+
+    d = Domain.create(domain)
+    if not d:
+        flash(u'创建失败', 'error')
+        return redirect(url_for('admin.create_domain'))
+    return redirect(url_for('admin.domain_show'))
+
+@bp.route('/domain/<id>/delete/', methods=['POST'])
+def delete_domain(id):
+    d = Domain.get(id)
+    if not d:
+        abort(404)
+    d.delete()
+    return redirect(url_for('admin.domain_show'))
 
 @bp.route('/cidrs/')
 def cidrs_show():

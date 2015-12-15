@@ -12,18 +12,17 @@ from netaddr import IPNetwork, AddrFormatError
 from sqlalchemy.ext.declarative import declared_attr
 
 from argonath.ext import db
-from argonath.config import ETCDS
-from argonath.consts import DEFAULT_NET
+from argonath.config import ETCDS, DEFAULT_NET
 
+def _parse_reversed_domain(domain):
+    return os.path.join('/skydns', '/'.join(reversed(domain.split('.'))))
 
 def _get_host_port(s):
     h, p = s.split(':')
     return h, int(p)
 
-
 _etcd_machines = [_get_host_port(host) for host in ETCDS.split(',')]
 _etcd = etcd.Client(tuple(_etcd_machines), allow_reconnect=True)
-
 
 def health_check():
     rs = {}
@@ -35,10 +34,9 @@ def health_check():
             url = nodeinfo['clientURLs'][0]
             r = requests.get(url + '/health', timeout=3)
             rs[nodename] = json.loads(r.content)['health']
-        except:
+        except Exception:
             rs[nodename] = False
     return rs
-
 
 class Base(db.Model):
 
@@ -63,7 +61,6 @@ class Base(db.Model):
     def __repr__(self):
         attrs = ', '.join('{0}={1}'.format(k, v) for k, v in self.to_dict().iteritems())
         return '{0}({1})'.format(self.__class__.__name__, attrs)
-
 
 class Record(Base):
 
@@ -117,12 +114,14 @@ class Record(Base):
 
     @property
     def skydns_path(self):
-        return os.path.join('/skydns', '/'.join(reversed(self.domain.split('.'))))
+        return _parse_reversed_domain(self.domain)
 
     @property
     def skydns_data(self):
         try:
             r = _etcd.get(self.skydns_path)
+            if r.dir:
+                r = _etcd.get(os.path.join(self.skydns_path, '.self'))
             return json.loads(r.value)
         except (KeyError, EtcdKeyError):
             return {}
@@ -130,13 +129,11 @@ class Record(Base):
     @property
     def hosts(self):
         data = self.skydns_data
-        if data:
-            cidrs = data.keys()
-            return_dict = {}
-            for cidr in cidrs:
-                return_dict[cidr] = [x['host'] for x in data[cidr]]
-            return return_dict
-        return data
+        if not data:
+            return data
+        return dict([
+            (cidr, [h['host'] for h in hosts]) for cidr, hosts in data.iteritems()
+        ])
 
     def get_comments(self):
         return json.loads(self.comments)
@@ -155,40 +152,48 @@ class Record(Base):
         db.session.add(self)
         db.session.commit()
 
-    def add_host(self, cidr, host_or_ip, comment=''):
-        data = self.skydns_data
-        if not data.get(cidr):
-            data[cidr] = [{'host': host_or_ip}]
-        elif host_or_ip not in [x['host'] for x in data[cidr]]:
-            data[cidr].append({'host': host_or_ip})
+    def _parse_data(self, data):
+        return dict([
+            (cidr, [{'host': h} for h in hosts]) for cidr, hosts in data.iteritems()
+        ])
 
-        _etcd.set(self.skydns_path, json.dumps(data))
+    def add_host(self, cidr, host_or_ip, comment=''):
+        data = self.hosts
+        if not data.get(cidr):
+            data[cidr] = [host_or_ip, ]
+        elif host_or_ip not in data[cidr]:
+            data[cidr].append(host_or_ip)
+
+        _etcd.set(self.skydns_path, json.dumps(self._parse_data(data)))
         self.set_comment(host_or_ip, comment)
 
     def delete_host(self, cidr, host_or_ip):
-        data = self.skydns_data
-        if data.get(cidr):
-            data[cidr] = [x for x in data[cidr] if x['host'] != host_or_ip]
+        data = self.hosts
         if not data[cidr]:
             del data[cidr]
+        else:
+            data[cidr] = [x for x in data[cidr] if x != host_or_ip]
 
-        _etcd.set(self.skydns_path, json.dumps(data))
+        _etcd.set(self.skydns_path, json.dumps(self._parse_data(data)))
         self.delete_comment(host_or_ip)
 
     def can_do(self, user):
         return user and (self.user_id == user.id or user.is_admin())
 
     def delete(self):
-        _etcd.delete(self.skydns_path)
-
-        db.session.delete(self)
-        db.session.commit()
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            return
+        else:
+            _etcd.delete(self.skydns_path)
 
     def to_dict(self):
         d = super(Record, self).to_dict()
         d['host'] = self.hosts
         return d
-
 
 class User(Base):
 
@@ -262,7 +267,6 @@ class User(Base):
         d['is_admin'] = self.is_admin()
         return d
 
-
 class CIDR(Base):
     __tablename__ = "cidr"
     name = db.Column(db.String(255), unique=True, nullable=False)
@@ -307,8 +311,8 @@ class CIDR(Base):
         except AddrFormatError:
             return None
         try:
-            self.name=name
-            self.cidr=cidr
+            self.name = name
+            self.cidr = cidr
             db.session.add(self)
             db.session.commit()
             return self
@@ -319,3 +323,84 @@ class CIDR(Base):
     def delete(self):
         db.session.delete(self)
         db.session.commit()
+
+class Domain(Base):
+    __tablename__ = "domain"
+
+    domain = db.Column(db.String(255), unique=True, nullable=False)
+    reversed_path = db.Column(db.String(255), unique=True, nullable=False)
+
+    def __init__(self, domain):
+        self.domain = domain
+        self.reversed_path = _parse_reversed_domain(domain)
+
+    @classmethod
+    def create(cls, domain):
+        try:
+            d = cls(domain)
+            db.session.add(d)
+            db.session.commit()
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
+            return None
+        else:
+            try:
+                r = _etcd.read(d.reversed_path)
+            except etcd.EtcdKeyNotFound:
+                _etcd.write(d.reversed_path, None, dir=True)
+                return d
+            else:
+                if r.dir:
+                    return d
+                #拿到之前的值
+                v = r.value
+                _etcd.delete(d.reversed_path)
+                _etcd.write(os.path.join(d.reversed_path, '.self'), v)
+                return d
+
+    @classmethod
+    def get_by_name(cls, domain):
+        return cls.query.filter(cls.domain == domain).first()
+
+    @classmethod
+    def list_domains(cls, start=0, limit=20):
+        q = cls.query.order_by(cls.id.desc())
+        return q[start:start+limit], q.count()
+
+    @classmethod
+    def get_all(cls):
+        return [item.domain for item in cls.query.all()]
+
+    def edit(self, domain):
+        try:
+            self.domain = domain
+            self.reversed_path = _parse_reversed_domain(domain)
+            db.session.add(self)
+            db.session.commit()
+            return self
+        except sqlalchemy.exc.IntegrityError:
+            db.session.rollback()
+            return None
+
+    def delete(self):
+        try:
+            db.session.delete(self)
+            db.session.commit()
+            return True
+        except Exception:
+            db.session.rollback()
+            return False
+        else:
+            try:
+                r = _etcd.read(self.reversed_path)
+                if r.dir:
+                    _etcd.delete(self.reversed_path, recursive=True, dir=True)
+                else:
+                    _etcd.delete(self.reversed_path)
+            except etcd.EtcdKeyNotFound:
+                return True
+            except Exception:
+                return False
+            else:
+                return True
+

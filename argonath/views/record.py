@@ -3,9 +3,8 @@
 from flask import (Blueprint, request, g, abort,
         render_template, url_for, flash, redirect)
 
-from argonath.models import Record, CIDR
+from argonath.models import Record, CIDR, Domain
 from argonath.utils import need_login
-from argonath.consts import sub_domains
 
 bp = Blueprint('record', __name__, url_prefix='/record')
 
@@ -42,6 +41,7 @@ def query_record():
 @need_login
 def create_record():
     if request.method == 'GET':
+        sub_domains = Domain.get_all()
         return render_template('create_record.html', sub_domains=sub_domains)
     name = request.form.get('name', default='').strip()
     subname = request.form.get('subname', default='').strip()
@@ -54,11 +54,10 @@ def create_record():
     if '.' in name:
         flash(u'域名不能包含"."', 'error')
         return redirect(url_for('record.create_record'))
-    if subname not in sub_domains:
+    if not Domain.get_by_name(subname):
         flash(u'不正确的子域名', 'error')
         return redirect(url_for('record.create_record'))
-
-    domain = name + '.' + subname + '.hunantv.com'
+    domain = '%s.%s' % (name, subname)
 
     r = Record.get_by_domain(domain)
     if r:

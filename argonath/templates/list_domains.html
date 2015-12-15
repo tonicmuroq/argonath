@@ -1,0 +1,55 @@
+{% extends "/base.html" %}
+{% import "/utils.html" as utils %}
+
+{% block more_css %}
+  div.row {margin-bottom: 15px;}
+{% endblock %}
+
+{% block main %}
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <td>Domain</td>
+        <td>Path</td>
+        <td>Ops</td>
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in domains %}
+        <tr>
+          <td>{{d.domain}}</a></td>
+          <td>{{d.reversed_path}}</td>
+          <td>
+            <a class="btn btn-block btn-sm btn-danger" href="{{url_for('admin.delete_domain', id=d.id)}}">
+            <span class="fui-trash"></span> 删除
+            </a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="row">
+    <div class="col-xs-3">
+      <a class="btn btn-block btn-sm btn-warning" href="{{url_for('admin.create_domain')}}">
+      <span class="fui-new"></span> NEW Domain
+      </a>
+    </div>
+  </div>
+
+  {{utils.paginator(g.start, total, g.limit, endpoint)}}
+
+  <script>
+    $('.btn-danger.btn-sm').click(function(e){
+      if (!confirm('确定要删除么?')) {
+        return;
+      }
+      e.preventDefault();
+      var self = $(this),
+        href = self.attr('href');
+      $.post(href, {}, function(){
+          window.location.href = "{{url_for('admin.domain_show')}}";
+      });
+    });
+  </script>
+
+{% endblock %}
