@@ -6,7 +6,6 @@
     <thead>
       <tr>
         <td>域名</td>
-        <td>地址</td>
         <td>所有者</td>
       </tr>
     </thead>
@@ -14,7 +13,6 @@
       {% for record in records %}
         <tr>
             <td><a href="{{url_for('record.get_record', record_id=record.id)}}" target="_blank">{{record.domain}}</a></td>
-          <td>{{record.host}}</td>
           <td>{{record.user.name}}</td>
         </tr>
       {% endfor %}

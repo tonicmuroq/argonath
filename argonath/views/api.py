@@ -2,9 +2,8 @@
 
 from flask import Blueprint, request, g, abort
 
-from argonath.models import User, Record
+from argonath.models import User, Record, Domain
 from argonath.utils import api_need_token, jsonize
-from argonath.consts import sub_domains
 
 bp = Blueprint('api', __name__, url_prefix='/_api')
 
@@ -53,9 +52,9 @@ def create_record():
             abort(400, u'域名长度必须大于5')
         if '.' in name:
             abort(400, u'域名不能包含"."')
-        if subname not in sub_domains:
+        if not Domain.get_by_name(subname):
             abort(400, u'不正确的子域名')
-        domain = name + '.' + subname + '.hunantv.com'
+        domain = '%s.%s' % (name, subname)
     # 是admin就很暴力了...
     # 可以随便传域名的哦...
     else:

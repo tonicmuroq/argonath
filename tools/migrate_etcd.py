@@ -18,18 +18,16 @@ def main(src, dst):
     source_etcd = create(src)
     target_etcd = create(dst)
 
-    nodes = dict(get_node(source_etcd, "/skydns/com/hunantv"))
+    nodes = dict(get_node(source_etcd, "/skydns"))
     for k, v in nodes.iteritems():
+        print k, v
         if not v or k == '.wildcards':
             continue
-        host = json.loads(v)
-        if host.get("default", None):
-            continue
-        target_etcd.set(k, json.dumps({'default': [host]}))
+        target_etcd.set(k, v)
 
 def check(src):
     c = create(src)
-    r = c.read('/skydns/com/hunantv', recursive=True)
+    r = c.read('/skydns', recursive=True)
     for node in r.get_subtree():
         if node.dir:
             continue

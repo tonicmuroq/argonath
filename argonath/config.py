@@ -8,17 +8,12 @@ MYSQL_USER = os.getenv('MYSQL_USER', 'root')
 MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD', '')
 MYSQL_DATABASE = os.getenv('MYSQL_DATABASE', 'argonath')
 
-ETCDS = os.getenv('ETCDS', 'localhost:4001')
-
 SQLALCHEMY_POOL_SIZE = 100
 SQLALCHEMY_POOL_TIMEOUT = 10
 SQLALCHEMY_POOL_RECYCLE = 2000
 
-OPENID2_YADIS = 'http://openids.intra.hunantv.com/server/yadis/'
-OPENID2_LOGOUT = 'http://openids.intra.hunantv.com/auth/logout/'
-
-SUBDOMAINS = os.getenv('SUBDOMAINS', 'intra')
-
+DEFAULT_NET = "default"
+ETCDS = os.getenv('ETCDS', 'localhost:4001')
 ARGONATH_ADMIN = os.getenv('ARGONATH_ADMIN', '')
 
 try:

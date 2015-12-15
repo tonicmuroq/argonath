@@ -2,11 +2,10 @@
 
 import sys
 import os
-sys.path.append(os.path.abspath('.'))
+sys.path.append(os.path.abspath('..'))
 
 from argonath.app import create_app
 from argonath.ext import db
-from argonath.models import User, Record, CIDR
 
 def flushdb(app):
     with app.app_context():

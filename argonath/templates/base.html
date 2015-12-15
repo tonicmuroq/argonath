@@ -58,6 +58,14 @@
                     <a href="{{url_for('admin.list_my_records')}}"><span class="fui-list-numbered"></span> 查看admin域名</a>
                   </li>
                   <li class="divider"></li>
+                  <li class="{{'active' if request.path == url_for('admin.domain_show') else ''}}">
+                    <a href="{{url_for('admin.domain_show')}}"><span class="fui-list-numbered"></span> 查看 subname </a>
+                  </li>
+                  <li class="divider"></li>
+                  <li class="{{'active' if request.path == url_for('admin.create_domain') else ''}}">
+                    <a href="{{url_for('admin.create_domain')}}"><span class="fui-list-numbered"></span> 增加 subname </a>
+                  </li>
+                  <li class="divider"></li>
                   <li class="{{'active' if request.path == url_for('admin.cidrs_show') else ''}}">
                     <a href="{{url_for('admin.cidrs_show')}}"><span class="fui-location"></span> CIDR</a>
                   </li>
@@ -75,9 +83,9 @@
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{g.user.name or '未登录'}} <b class="caret"></b></a>
             <ul class="dropdown-menu">
               {% if g.user %}
-                <li><a href="{{openid2.logout_url}}">Logout</a></li>
+                <li><a href="">Logout</a></li>
               {% else %}
-                <li><a href="{{openid2.login_url}}">Login</a></li>
+                <li><a href="">Login</a></li>
               {% endif %}
             </ul>
           </li>

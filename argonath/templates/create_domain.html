@@ -2,17 +2,11 @@
 {% import "/utils.html" as utils %}
 
 {% block main %}
-  <form class="form-horizontal" method="post" action="{{url_for('admin.create_record')}}">
+  <form class="form-horizontal" method="post" action="{{url_for('admin.create_domain')}}">
     <div class="form-group">
-      <label class="col-sm-2 control-label">域名</label>
+      <label class="col-sm-2 control-label">Domain</label>
       <div class="col-sm-4">
-        <input name="name" type="text" class="form-control" placeholder="域名, 如argonath.example.com">
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="col-sm-2 control-label">地址</label>
-      <div class="col-sm-4">
-        <input name="host" type="text" class="form-control" placeholder="地址, 如10.1.201.47, 或者redis-ctl.example.com">
+        <input name="domain" type="text" class="form-control" placeholder="Network Name, ep. nova.ricebook.net">
       </div>
     </div>
     {% with errors = get_flashed_messages(category_filter=['error'])%}
@@ -28,7 +22,7 @@
     {% endwith %}
     <div class="form-group">
       <div class="col-sm-offset-2 col-sm-4">
-        <button type="submit" class="btn btn-primary">去吧皮卡丘!</button>
+        <button type="submit" class="btn btn-primary">就决定是你了!</button>
       </div>
     </div>
   </form>

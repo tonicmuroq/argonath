@@ -5,16 +5,15 @@ import random
 import string
 from datetime import datetime
 from functools import wraps
-from flask import abort, g, redirect, Response
+from flask import abort, g, Response
 
-from argonath.ext import openid2
 from argonath.models import Base
 
 def need_login(f):
     @wraps(f)
     def _(*args, **kwargs):
-        if not g.user:
-            return redirect(openid2.login_url)
+        #if not g.user:
+        #    return redirect(openid2.login_url)
         return f(*args, **kwargs)
     return _
 
@@ -29,8 +28,8 @@ def api_need_token(f):
 def need_admin(f):
     @wraps(f)
     def _(*args, **kwargs):
-        if not g.user:
-            return redirect(openid2.login_url)
+        #if not g.user:
+        #    return redirect(openid2.login_url)
         if not g.user.is_admin():
             abort(403)
         return f(*args, **kwargs)
