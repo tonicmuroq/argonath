@@ -2,6 +2,8 @@
 
 import os
 
+DEBUG = True
+
 MYSQL_HOST = os.getenv('MYSQL_HOST', 'localhost')
 MYSQL_PORT = int(os.getenv('MYSQL_PORT', '3306'))
 MYSQL_USER = os.getenv('MYSQL_USER', 'root')
@@ -15,6 +17,7 @@ SQLALCHEMY_POOL_RECYCLE = 2000
 DEFAULT_NET = "default"
 ETCDS = os.getenv('ETCDS', 'localhost:4001')
 ARGONATH_ADMIN = os.getenv('ARGONATH_ADMIN', '')
+SERVER_PORT = int(os.getenv('SERVER_PORT', '5000'))
 
 try:
     from .local_config import *
