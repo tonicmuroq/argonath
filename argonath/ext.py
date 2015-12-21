@@ -2,6 +2,5 @@
 
 from flask.ext.sqlalchemy import SQLAlchemy
 
-db = SQLAlchemy()
 
-__all__ = ['db',]
+db = SQLAlchemy()

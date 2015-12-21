@@ -8,6 +8,7 @@
     <!-- Le styles -->
     <link href="/argonath/static/css/vendor/bootstrap.min.css" rel="stylesheet" type="text/css">
     <link href="/argonath/static/css/flat-ui.min.css" rel="stylesheet" type="text/css">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
     <script src="/argonath/static/js/vendor/jquery.min.js"></script>
     <script src="/argonath/static/js/flat-ui.min.js"></script>
     <script src="/argonath/static/js/application.js"></script>
@@ -83,9 +84,9 @@
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{g.user.name or '未登录'}} <b class="caret"></b></a>
             <ul class="dropdown-menu">
               {% if g.user %}
-                <li><a href="">Logout</a></li>
+              <li><a href="{{ url_for('user.logout') }}">Logout</a></li>
               {% else %}
-                <li><a href="">Login</a></li>
+              <li><a href="{{ url_for('user.login') }}">Login</a></li>
               {% endif %}
             </ul>
           </li>

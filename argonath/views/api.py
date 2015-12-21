@@ -7,11 +7,13 @@ from argonath.utils import api_need_token, jsonize
 
 bp = Blueprint('api', __name__, url_prefix='/_api')
 
+
 @bp.route('/record/all/')
 @jsonize
 def list_all_records():
     records, _ = Record.list_records(g.start, g.limit)
     return {'r': 0, 'message': 'ok', 'data': records}
+
 
 @bp.route('/record/mine/')
 @jsonize
@@ -19,6 +21,7 @@ def list_all_records():
 def list_my_records():
     records, _ = g.user.list_records(g.start, g.limit)
     return {'r': 0, 'message': 'ok', 'data': records}
+
 
 @bp.route('/record/<int:record_id>/')
 @jsonize
@@ -28,6 +31,7 @@ def get_record(record_id):
         abort(400, u'没有找到记录')
     return {'r': 0, 'message': 'ok', 'data': record}
 
+
 @bp.route('/record/search/')
 @jsonize
 def query_record():
@@ -36,6 +40,7 @@ def query_record():
     if not r:
         abort(404, u'没有找到记录')
     return {'r': 0, 'message': 'ok', 'data': r}
+
 
 @bp.route('/record/create/', methods=['POST'])
 @jsonize
@@ -71,23 +76,6 @@ def create_record():
         abort(400, u'创建失败, 别问我为什么是400... o(￣ヘ￣*o)')
     return {'r': 0, 'message': 'ok', 'data': r}
 
-@bp.route('/record/<record_id>/edit/', methods=['POST', 'PUT'])
-@jsonize
-@api_need_token
-def edit_record(record_id):
-    return {'r': 1, 'message': u'接口已经被弃用'}
-    # record = Record.get(record_id)
-    # if not record:
-    #     abort(400, u'没有找到记录')
-    # if not record.can_do(g.user):
-    #     abort(403, u'没有权限编辑这个记录')
-
-    # host_or_ip = request.form.get('host', default='').strip()
-    # if not host_or_ip:
-    #     abort(400, u'必须填写一个host')
-
-    # record.edit(host_or_ip)
-    # return {'r': 0, 'message': 'ok', 'data': record}
 
 @bp.route('/record/<record_id>/', methods=['DELETE'])
 @jsonize
@@ -101,12 +89,14 @@ def delete_record(record_id):
     record.delete()
     return {'r': 0, 'message': 'ok', 'data': None}
 
+
 @bp.before_request
 def init_global_vars():
     token = request.args.get('token')
     if not token:
         token = request.headers.get('X-Argonath-Token', '')
     g.user = User.get_by_token(token)
+
 
 @bp.errorhandler(400)
 @bp.errorhandler(403)

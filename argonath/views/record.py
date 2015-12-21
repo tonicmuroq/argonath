@@ -8,11 +8,13 @@ from argonath.utils import need_login
 
 bp = Blueprint('record', __name__, url_prefix='/record')
 
+
 @bp.route('/all/')
 def list_all_records():
     records, total = Record.list_records(g.start, g.limit)
     return render_template('list_records.html', records=records,
             total=total, endpoint='record.list_all_records')
+
 
 @bp.route('/mine/')
 @need_login
@@ -20,6 +22,7 @@ def list_my_records():
     records, total = g.user.list_records(g.start, g.limit)
     return render_template('list_records.html', records=records,
             total=total, endpoint='record.list_my_records')
+
 
 @bp.route('/<int:record_id>/')
 def get_record(record_id):
@@ -29,6 +32,7 @@ def get_record(record_id):
     comments = record.get_comments()
     return render_template('record.html', record=record, comments=comments)
 
+
 @bp.route('/search/')
 def query_record():
     query = request.args.get('q', default='')
@@ -37,12 +41,14 @@ def query_record():
         abort(404)
     return render_template('record.html', record=r)
 
+
 @bp.route('/create/', methods=['GET', 'POST'])
 @need_login
 def create_record():
     if request.method == 'GET':
         sub_domains = Domain.get_all()
         return render_template('create_record.html', sub_domains=sub_domains)
+
     name = request.form.get('name', default='').strip()
     subname = request.form.get('subname', default='').strip()
     host_or_ip = request.form.get('host', default='').strip()
@@ -72,6 +78,7 @@ def create_record():
         return redirect(url_for('record.create_record'))
     return redirect(url_for('record.get_record', record_id=r.id))
 
+
 @bp.route('/<record_id>/edit/')
 @need_login
 def edit_record(record_id):
@@ -85,6 +92,7 @@ def edit_record(record_id):
     comments = record.get_comments()
     return render_template('edit_record.html', record=record, cidrs=cidrs, comments=comments)
 
+
 @bp.route('/<record_id>/hosts/add/', methods=['POST'])
 @need_login
 def add_host_to_record(record_id):
@@ -93,17 +101,21 @@ def add_host_to_record(record_id):
         abort(404)
     if not record.can_do(g.user):
         abort(403)
+
     cidr = request.form.get('cidr', default='').strip()
     host_or_ip = request.form.get('host', default='').strip()
     comment = request.form.get('comment', default='').strip()
+
     if not host_or_ip:
         flash(u'必须填写一个host', 'error')
         return redirect(url_for('record.edit_record', record_id=record.id))
     if not cidr:
-        flash(u'Where is CIDR???', 'error')
+        flash(u'需要一个CIDR', 'error')
         return redirect(url_for('record.edit_record', record_id=record.id))
+
     record.add_host(cidr, host_or_ip, comment)
     return redirect(url_for('record.get_record', record_id=record.id))
+
 
 @bp.route('/<record_id>/hosts/delete/', methods=['POST'])
 @need_login
@@ -122,8 +134,10 @@ def delete_host_from_record(record_id):
     if not host_or_ip:
         flash(u'必须填写一个host', 'error')
         return redirect(url_for('record.edit_record', record_id=record.id))
+
     record.delete_host(cidr, host_or_ip)
     return redirect(url_for('record.edit_record', record_id=record.id))
+
 
 @bp.route('/<record_id>/delete/', methods=['POST'])
 @need_login
@@ -135,6 +149,7 @@ def delete_record(record_id):
         abort(403)
     record.delete()
     return redirect(url_for('record.list_all_records'))
+
 
 @bp.errorhandler(403)
 @bp.errorhandler(404)

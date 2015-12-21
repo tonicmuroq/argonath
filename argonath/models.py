@@ -10,19 +10,24 @@ import sqlalchemy.exc
 from etcd import EtcdKeyError
 from netaddr import IPNetwork, AddrFormatError
 from sqlalchemy.ext.declarative import declared_attr
+from werkzeug.security import gen_salt
 
 from argonath.ext import db
 from argonath.config import ETCDS, DEFAULT_NET
 
+
 def _parse_reversed_domain(domain):
     return os.path.join('/skydns', '/'.join(reversed(domain.split('.'))))
+
 
 def _get_host_port(s):
     h, p = s.split(':')
     return h, int(p)
 
+
 _etcd_machines = [_get_host_port(host) for host in ETCDS.split(',')]
 _etcd = etcd.Client(tuple(_etcd_machines), allow_reconnect=True)
+
 
 def health_check():
     rs = {}
@@ -37,6 +42,7 @@ def health_check():
         except Exception:
             rs[nodename] = False
     return rs
+
 
 class Base(db.Model):
 
@@ -61,6 +67,7 @@ class Base(db.Model):
     def __repr__(self):
         attrs = ', '.join('{0}={1}'.format(k, v) for k, v in self.to_dict().iteritems())
         return '{0}({1})'.format(self.__class__.__name__, attrs)
+
 
 class Record(Base):
 
@@ -195,6 +202,7 @@ class Record(Base):
         d['host'] = self.hosts
         return d
 
+
 class User(Base):
 
     __tablename__ = 'user'
@@ -211,12 +219,11 @@ class User(Base):
 
     @classmethod
     def get_or_create(cls, name, email):
-        from argonath.utils import random_string
         u = cls.get_by_email(email)
         if u:
             return u
         try:
-            u = cls(name, email, random_string(20))
+            u = cls(name, email, gen_salt(20))
             db.session.add(u)
             db.session.commit()
             return u
@@ -266,6 +273,7 @@ class User(Base):
         d.pop('token', None)
         d['is_admin'] = self.is_admin()
         return d
+
 
 class CIDR(Base):
     __tablename__ = "cidr"
@@ -323,6 +331,7 @@ class CIDR(Base):
     def delete(self):
         db.session.delete(self)
         db.session.commit()
+
 
 class Domain(Base):
     __tablename__ = "domain"
@@ -403,4 +412,3 @@ class Domain(Base):
                 return False
             else:
                 return True
-

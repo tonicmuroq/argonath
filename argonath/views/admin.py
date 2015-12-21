@@ -7,10 +7,12 @@ from argonath.models import User, Record, CIDR, Domain, health_check
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
+
 @bp.route('/')
 def index():
     users = User.list_users(g.start, g.limit)
     return render_template('admin.html', user=g.user, users=users)
+
 
 @bp.route('/create/', methods=['GET', 'POST'])
 def create_record():
@@ -37,16 +39,19 @@ def create_record():
 
     return redirect(url_for('record.get_record', record_id=r.id))
 
+
 @bp.route('/list/')
 def list_my_records():
     records, total = g.user.list_records(g.start, g.limit)
     return render_template('admin_list.html',
             records=records, total=total, endpoint='admin.list_my_records')
 
+
 @bp.route('/user_records/<username>/')
 def user_records(username):
     user = User.get_by_name(username)
     return render_template('user_records.html', user=user)
+
 
 @bp.route('/transfer/<username>/', methods=['POST'])
 def transfer(username):
@@ -55,10 +60,12 @@ def transfer(username):
     flash(u'转移了{0}的域名'.format(username))
     return redirect(url_for('admin.index'))
 
+
 @bp.route('/domain/')
 def domain_show():
     domains, total = Domain.list_domains()
     return render_template('list_domains.html', domains=domains, total=total, endpoint='admin.domain_show')
+
 
 @bp.route('/domain/add', methods=['GET', 'POST'])
 def create_domain():
@@ -77,6 +84,7 @@ def create_domain():
         return redirect(url_for('admin.create_domain'))
     return redirect(url_for('admin.domain_show'))
 
+
 @bp.route('/domain/<id>/delete/', methods=['POST'])
 def delete_domain(id):
     d = Domain.get(id)
@@ -85,10 +93,12 @@ def delete_domain(id):
     d.delete()
     return redirect(url_for('admin.domain_show'))
 
+
 @bp.route('/cidrs/')
 def cidrs_show():
     cidrs, total = CIDR.list_cidrs(g.start, g.limit)
     return render_template('list_cidrs.html', cidrs=cidrs, total=total, endpoint='admin.cidrs_show')
+
 
 @bp.route('/cidrs/add/', methods=['GET', 'POST'])
 def create_cidr():
@@ -109,6 +119,7 @@ def create_cidr():
         return redirect(url_for('admin.create_cidr'))
     return redirect(url_for('admin.get_cidr', id=r.id))
 
+
 @bp.route('/cidrs/<id>/delete/', methods=['POST'])
 def delete_cidr(id):
     c = CIDR.get(id)
@@ -119,6 +130,7 @@ def delete_cidr(id):
     c.delete()
     return redirect(url_for('admin.cidrs_show'))
 
+
 @bp.route('/cidrs/<id>/')
 def get_cidr(id):
     c = CIDR.get(id)
@@ -126,6 +138,7 @@ def get_cidr(id):
         return render_template('cidr.html', cidr=c)
     flash('no cidr with this id', 'error')
     return redirect(url_for('admin.cidrs_show'))
+
 
 @bp.route('/cidrs/<id>/edit/', methods=['GET', 'POST'])
 def edit_cidr(id):
@@ -145,15 +158,18 @@ def edit_cidr(id):
     flash("edit success", 'info')
     return redirect(url_for('admin.get_cidr', id=c.id))
 
+
 @bp.route('/health/', methods=['GET'])
 def health():
     health_info = health_check()
     return render_template('health.html', health_info=health_info)
 
+
 @bp.errorhandler(403)
 @bp.errorhandler(404)
 def error_handler(e):
     return render_template('%s.html' % e.code), e.code
+
 
 @bp.before_request
 @need_admin

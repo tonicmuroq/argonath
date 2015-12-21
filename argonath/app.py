@@ -1,9 +1,8 @@
 # coding: utf-8
 
-import json
 import logging
 
-from flask import Flask, request, g
+from flask import Flask, request, g, session
 from werkzeug.utils import import_string
 
 from argonath.ext import db
@@ -15,6 +14,7 @@ blueprints = (
     'record',
     'api',
     'admin',
+    'user',
 )
 
 def create_app():
@@ -38,10 +38,7 @@ def create_app():
 
     @app.before_request
     def init_global_vars():
-        #user_dict = json.loads(request.cookies.get(app.config['OPENID2_PROFILE_COOKIE_NAME'], '{}'))
-        #g.user = user_dict and User.get_or_create(user_dict['username'], user_dict['email']) or None
-        #TODO 加 openid
-        g.user = User.get_or_create('cmgs', 'ilskdw@gmail.com')
+        g.user = 'id' in session and User.get(session['id']) or None
         g.start = request.args.get('start', type=int, default=0)
         g.limit = request.args.get('limit', type=int, default=20)
 

@@ -6,9 +6,11 @@ from argonath.utils import need_login
 
 bp = Blueprint('index', __name__)
 
+
 @bp.route('/')
 def index():
     return redirect(url_for('record.list_all_records'))
+
 
 @bp.route('/api-docs/')
 @need_login
