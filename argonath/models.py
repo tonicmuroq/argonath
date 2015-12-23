@@ -72,7 +72,7 @@ class Base(db.Model):
 class Record(Base):
 
     __tablename__ = 'record'
-    name = db.Column(db.String(255), unique=True, nullable=False, default='')
+    name = db.Column(db.String(255), nullable=False, default='')
     domain = db.Column(db.String(255), unique=True, nullable=False, default='')
     time = db.Column(db.DateTime, default=datetime.datetime.now)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
