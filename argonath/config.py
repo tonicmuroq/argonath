@@ -22,7 +22,7 @@ OAUTH2_CLIENT_ID = os.getenv('OAUTH2_CLIENT_ID', '')
 OAUTH2_CLIENT_SECRET = os.getenv('OAUTH2_CLIENT_SECRET', '')
 OAUTH2_ACCESS_TOKEN_URL = os.getenv('OAUTH2_ACCESS_TOKEN_URL', '')
 OAUTH2_AUTHORIZE_URL = os.getenv('OAUTH2_AUTHORIZE_URL', '')
-OAUTH2_BASE_URL = os.getenv('OAUTH2_AUTHORIZE_URL', '')
+OAUTH2_BASE_URL = os.getenv('OAUTH2_BASE_URL', '')
 
 try:
     from .local_config import *
