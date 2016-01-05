@@ -17,8 +17,12 @@ SQLALCHEMY_POOL_RECYCLE = 2000
 DEFAULT_NET = 'default'
 ETCDS = os.getenv('ETCDS', 'localhost:4001')
 SERVER_PORT = int(os.getenv('SERVER_PORT', '5000'))
-OPENID_LOGIN_URL = os.getenv('OPENID_LOGIN_URL', '')
-OPENID_PROFILE_URL = os.getenv('OPENID_PROFILE_URL', '')
+
+OAUTH2_CLIENT_ID = os.getenv('OAUTH2_CLIENT_ID', '')
+OAUTH2_CLIENT_SECRET = os.getenv('OAUTH2_CLIENT_SECRET', '')
+OAUTH2_ACCESS_TOKEN_URL = os.getenv('OAUTH2_ACCESS_TOKEN_URL', '')
+OAUTH2_AUTHORIZE_URL = os.getenv('OAUTH2_AUTHORIZE_URL', '')
+OAUTH2_BASE_URL = os.getenv('OAUTH2_AUTHORIZE_URL', '')
 
 try:
     from .local_config import *
