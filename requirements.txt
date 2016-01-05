@@ -1,4 +1,5 @@
 Flask
+Flask-OAuthlib
 Flask-SQLAlchemy
 python-etcd
 MySQL-python
