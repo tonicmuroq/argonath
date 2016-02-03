@@ -1,11 +1,17 @@
 appname: "argonath"
 entrypoints:
   web:
+    cmd: "gunicorn -c gunicorn_config.py app:app --bind 0.0.0.0:5000"
+    ports:
+      - "5000/tcp"
+    network_mode: "none"
+  web-host:
     cmd: "gunicorn -c gunicorn_config.py app:app"
     ports:
       - "5001/tcp"
     network_mode: "host"
 build:
+  - "pip install -U pip"
   - "pip install -r requirements.txt"
 meta:
   version: "ricebook"
